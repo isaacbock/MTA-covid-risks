@@ -1,0 +1,8 @@
+# ide
+.vscode/
+
+# eslint tool files
+./src/.eslintrc.js
+./src/package.json
+./src/package-lock.json
+./src/node_modules/
