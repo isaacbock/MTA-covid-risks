@@ -5,10 +5,11 @@
  *  @param _data            -- Array with all stations of the bike-sharing network
  */
 
-StationMap = function(_parentElement, _data, _mapPosition) {
+StationMap = function(_parentElement, _metroData, _covidData, _mapPosition) {
 
 	this.parentElement = _parentElement;
-	this.data = _data;
+	this.metroData = _metroData;
+	this.covidData = _covidData;
 	this.mapPosition = _mapPosition
 
 	L.Icon.Default.imagePath = 'images/';
@@ -38,9 +39,13 @@ StationMap.prototype.initVis = function() {
 	}).addTo(vis.map);
 
 	// MTA Subway Line Data via https://data.cityofnewyork.us/Transportation/Subway-Lines/3qz8-muuu
-	$.getJSON("data/SubwayLines.geoJson", function(data) {
-		vis.SubwayLines = data;
-		vis.wrangleData();
+	$.getJSON("data/SubwayLines.geoJson", function(lineData) {
+		// NYC Zip Codes via XXXXX
+		$.getJSON("data/modzcta.geo.json", function(neighborhoodData) {
+			vis.subwayLines = lineData;
+			vis.modZCTA = neighborhoodData;
+			vis.wrangleData();
+		});
 	});
 }
 
@@ -71,7 +76,7 @@ StationMap.prototype.updateVis = function() {
 	// Add empty layer groups for the markers / map objects
 	let stations = L.layerGroup().addTo(vis.map);
 	
-	vis.data.forEach(station => {
+	vis.metroData.forEach(station => {
 		// Popup content
 		let popupContent = "<strong>"+ station.stop_name +"</strong><br/>";
 		popupContent += station.entries + " entries";
@@ -129,12 +134,44 @@ StationMap.prototype.updateVis = function() {
 		
 	});
 
+	// Add zip code overlays
+	L.geoJson(vis.modZCTA, {
+		style: styleZipCode,
+		weight: 1
+	}).addTo(vis.map);
+
 	// Add MTA lines
-	L.geoJson(vis.SubwayLines, {
+	L.geoJson(vis.subwayLines, {
 		style: styleMBTALine,
 		weight: 7,
 		opacity: 1
 	}).addTo(vis.map);
+
+	// Color zip codes by covid rates
+	function styleZipCode(feature) {
+		let zipCode = feature.properties.MODZCTA;
+		let lookupKey = "PCTPOS_" + zipCode;
+		let covidRate = vis.covidData[lookupKey];
+		console.log(covidRate);
+		if (covidRate >= 5) {
+			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .9, interactive: false };
+		}
+		else if (covidRate >= 4) {
+			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .7, interactive: false };
+		}
+		else if (covidRate >= 3) {
+			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .5, interactive: false };
+		}
+		else if (covidRate >= 2) {
+			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .3, interactive: false };
+		}
+		else if (covidRate >= 1) {
+			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .2, interactive: false };
+		}
+		else {
+			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .1, interactive: false };
+		}
+	}
 	// MTA line colors via http://web.mta.info/developers/resources/line_colors.htm
 	function styleMBTALine(feature) {
 		let station = feature.properties.name;
