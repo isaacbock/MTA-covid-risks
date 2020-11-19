@@ -6,3 +6,7 @@
 ./src/package.json
 ./src/package-lock.json
 ./src/node_modules/
+
+. .
+.
+.DS_Store
