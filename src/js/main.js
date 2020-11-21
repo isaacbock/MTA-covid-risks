@@ -1,9 +1,15 @@
 
 var metroData = [];
-var covidData = []
+var covidData = [];
 
 // Variable for the visualization instance
 var stationMap;
+var timeSelector;
+
+// Default options
+var showStations = true;
+var showLines = false;
+var showCOVID = true;
 
 // Start application by loading the data
 loadData();
@@ -30,5 +36,13 @@ function loadData() {
 
 function createVis() {
 	// Instantiate visualization
-	stationMap = new StationMap("station-map", metroData, covidData, [40.7300, -73.7800])
+	stationMap = new StationMap("station-map", metroData, covidData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
+	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
+}
+
+function toggleLayers(stations, lines, covid) {
+	showStations = stations;
+	showLines = lines;
+	showCOVID = covid;
+	stationMap.toggleLayers(showStations, showLines, showCOVID);
 }
