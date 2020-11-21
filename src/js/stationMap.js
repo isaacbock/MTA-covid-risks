@@ -30,6 +30,9 @@ StationMap = function(_parentElement, _metroData, _covidData, _mapPosition, _def
 
 StationMap.prototype.initVis = function() {
 	var vis = this;
+
+	vis.allStations = [];
+	vis.selectedStations = [];
 	
 	vis.map = L.map(vis.parentElement, {zoomControl: false}).setView(vis.mapPosition, 11);
 	L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}', {
@@ -84,7 +87,7 @@ StationMap.prototype.wrangleData = function() {
 
 StationMap.prototype.updateVis = function() {
 	var vis = this;
-	
+
 	vis.metroData.forEach(station => {
 		// Popup content
 		let popupContent = "<strong>"+ station.stop_name +"</strong><br/>";
@@ -123,7 +126,42 @@ StationMap.prototype.updateVis = function() {
 			// .bindPopup(popupContent)
 			.bindTooltip(popupContent)
 			.addTo(vis.map);
-		// vis.stations.addLayer(marker)
+		marker.name = station.stop_name;
+		marker.selected = false;
+		marker.on('click', onStationClick);
+		vis.allStations.push(marker);
+
+		function onStationClick(e) {
+			let station = e.target;
+			// select station
+			if (!station.selected) {
+				station.selected = true;
+				vis.selectedStations.push(station.name)
+			}
+			// else deselect station
+			else {
+				station.selected = false;
+				vis.selectedStations = vis.selectedStations.filter(name => name!==station.name)
+			}
+			// if some stations are selected, the rest should be somewhat desaturated for contrast
+			if (vis.selectedStations.length!=0) {
+				vis.allStations.forEach(station => {
+					if (vis.selectedStations.includes(station.name)) {
+						$(station._icon).removeClass("unselected");
+					}
+					else {
+						$(station._icon).addClass("unselected");
+					}
+				});
+			}
+			// else if no stations are selected, all should be displayed in full color
+			else {
+				vis.allStations.forEach(station => {
+					$(station._icon).removeClass("unselected");
+				});
+			}
+			selectStations(vis.selectedStations);
+		}
 	});
 
 	// Scale markers on zoom, adapted from https://stackoverflow.com/a/46016693
@@ -149,15 +187,6 @@ StationMap.prototype.updateVis = function() {
 		weight: 0,
 		pane: "COVID"
 	}).addTo(vis.map);
-
-	// Add MTA lines
-	L.geoJson(vis.subwayLines, {
-		style: styleMBTALine,
-		weight: 7,
-		opacity: 1,
-		pane: "lines"
-	}).addTo(vis.map);
-
 	// Color zip codes by covid rates
 	function styleZipCode(feature) {
 		let zipCode = feature.properties.MODZCTA;
@@ -183,6 +212,14 @@ StationMap.prototype.updateVis = function() {
 			return { fillColor: "#1E90FF", fillOpacity: .1, interactive: false };
 		}
 	}
+
+	// Add MTA lines
+	L.geoJson(vis.subwayLines, {
+		style: styleMBTALine,
+		weight: 7,
+		opacity: 1,
+		pane: "lines"
+	}).addTo(vis.map);
 	// MTA line colors via http://web.mta.info/developers/resources/line_colors.htm
 	function styleMBTALine(feature) {
 		let station = feature.properties.name;

@@ -46,3 +46,21 @@ function toggleLayers(stations, lines, covid) {
 	showCOVID = covid;
 	stationMap.toggleLayers(showStations, showLines, showCOVID);
 }
+
+function selectStations(stations) {
+
+	// update text label
+	let stationsString = "All Stations";
+	if (stations.length>0) {
+		stationsString = "";
+		stations.forEach(station => {
+			stationsString += station;
+			if (station!=stations[stations.length-1]) {
+				stationsString += ", <br>";
+			}
+		});
+	}
+	$("#current-stations").html(stationsString);
+
+	// TO-DO: update other visualizations
+}
