@@ -57,10 +57,10 @@
 					<div id="crowd-size-selector">
 						<p>In a crowd of </p>
 						<button>10</button>
+						<button>25</button>
 						<button>50</button>
-						<button>100</button>
 					</div>
-					<p>There's a <span id="crowd-risk-estimate">XX%</span> chance of 1+ positive case.</p>
+					<p>We estimate a <span id="crowd-risk-estimate"></span> chance<br>of 1+ positive case.</p>
 				</div>
 			</div>
 		</div>
@@ -68,7 +68,7 @@
 			<h3>Station Usage</h3>
 			<div>
 				<button>Daily Activity</button>
-				<button>Weekly Activity</button>
+				<button class="selected">Weekly Activity</button>
 			</div>
 			<div id="weekly-usage"></div>
 			<h3>Year-to-Date</h3>
@@ -81,13 +81,16 @@
 	<script src="js/lib/d3.v6.min.js"></script>
 	<script src="js/lib/leaflet.js"></script>
 	
-	<!-- utility libraries -->
+	<!-- Utility libraries -->
 	<script src="js/dateTimeUtils.js"></script>
-	
+	<script src="js/lib/turf.min.js"></script>
+
 	<!-- Visualization objects -->
 	<script src="js/stationMap.js"></script>
-	<script src="js/weeklyUsageChart.js"></script>
 	<script src="js/timeSelector.js"></script>
+	<script src="js/covidRisk.js"></script>
+	<script src="js/weeklyUsageChart.js"></script>
+  
 	<!-- Load data, create visualizations -->
 	<script src="js/main.js"></script>
 </body>
