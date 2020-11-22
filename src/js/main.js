@@ -28,7 +28,6 @@ function loadData() {
 				return d;
 			});
 
-			console.log(self.allMetroData);
 			// FOR NOW, ONLY USE THE MOST RECENT DATE (IN ORDER TO TEST AND SET UP THE MAIN MAP VISUALIZATION)
 			self.metroData = self.metroData.filter( record => record.date=="2020-10-14 EST");
 			self.covidData = self.covidData[covidData.length-1];

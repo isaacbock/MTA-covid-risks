@@ -22,11 +22,12 @@ WeeklyUsageChart = function(_parentElement, _metroData, _endDate) {
 WeeklyUsageChart.prototype.initVis = function() {
     var vis = this;
 
-    vis.margin = { top: 40, right: 0, bottom: 20, left: 60 };
+    vis.margin = { top: 40, right: 0, bottom: 40, left: 60 };
 
 	vis.width = 400 - vis.margin.left - vis.margin.right,
     vis.height = 150 - vis.margin.top - vis.margin.bottom;
 
+	vis.barWidth = 30;
   	// SVG drawing area
 	vis.svg = d3.select("#" + vis.parentElement).append("svg")
 	    .attr("width", vis.width + vis.margin.left + vis.margin.right)
@@ -34,9 +35,13 @@ WeeklyUsageChart.prototype.initVis = function() {
        	.append("g")
 		.attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")")
 	
-	// Initialize Scale
+	// Initialize Scales and Axex
 	vis.heightScale = d3.scaleLinear().range([vis.height, 10]);
-	
+	vis.xScale = d3.scaleTime().range([0, vis.width - vis.barWidth-20]);
+
+	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
+	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
+
 	vis.wrangleData();
 }
 
@@ -94,14 +99,12 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	var selection = vis.svg.selectAll("rect").data(vis.aggregatedDataArray);
 
 	//constants for styling
-	const barWidth = 30;
-	const xOffset = 40;
 	const color = "grey";
 
 	//update
 	selection
-	.attr("width", barWidth)
-	.attr("x", (d,i)=>i*xOffset)
+	.attr("width", vis.barWidth)
+	.attr("x", (d)=> vis.xScale(d.date))
 	.attr("y", d => {
 		return vis.height - vis.heightScale(vis.usageDataOfInterest(d));
 	})
@@ -110,8 +113,8 @@ WeeklyUsageChart.prototype.updateVis = function() {
 
 	//enter 
 	selection.enter().append("rect")
-	.attr("width", barWidth)
-	.attr("x", (_,i)=>i*xOffset)
+	.attr("width", vis.barWidth)
+	.attr("x", (d)=> vis.xScale(d.date))
 	.attr("y", d => {
 		return vis.height - vis.heightScale(vis.usageDataOfInterest(d));
 	})
@@ -122,7 +125,22 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	selection.exit().remove();
 
 	//TODO draw axis and labels
+	vis.svg.selectAll(".y-axis").remove();
+	vis.svg.selectAll(".x-axis").remove();
 
+	vis.svg.append("g")
+	.attr("class", "axis y-axis")
+	.attr("transform", "translate(0, 0)")
+	.call(vis.yAxis)
+	console.log(vis.yAxis.scale().domain())
+	vis.svg.append("g")
+	.attr("class", "axis x-axis")
+	.attr("transform", "translate(0, 70)")
+	.call(vis.xAxis)
+
+	vis.svg.selectAll(".x-axis text")
+	.attr("text-anchor", "end")
+	.attr("transform", "rotate(-45)")
 }
 
 WeeklyUsageChart.prototype.changeStation = function(stations){
@@ -133,11 +151,15 @@ WeeklyUsageChart.prototype.changeStation = function(stations){
 
 WeeklyUsageChart.prototype.setScaleDomain = function(){
 	vis = this;
-
 	this.heightScale.domain([
 		d3.min(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d)),
 		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
 	])
+
+	this.xScale.domain([vis.startDate, vis.endDate])
+
+	this.yAxis.scale(this.heightScale);
+	this.xAxis.scale(this.xScale);
 }
 
 //get usage data of interest (all, or specific station's)
