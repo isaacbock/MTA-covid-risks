@@ -152,7 +152,7 @@ StationMap.prototype.updateVis = function() {
 		let zipCode = feature.properties.MODZCTA;
 		let lookupKey = "PCTPOS_" + zipCode;
 		let covidRate = vis.covidData[lookupKey];
-		console.log(covidRate);
+		
 		if (covidRate >= 5) {
 			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .9, interactive: false };
 		}

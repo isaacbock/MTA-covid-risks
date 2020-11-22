@@ -15,11 +15,18 @@ function loadData() {
 		d3.csv("data/percent-positive.csv").then( covidData => {
 			self.metroData = metroData;
 			self.covidData = covidData;
-			// FOR NOW, ONLY USE THE MOST RECENT DATE (IN ORDER TO TEST AND SET UP THE MAIN MAP VISUALIZATION)
-			self.metroData = self.metroData.filter( record => record.date=="2020-10-14");
-			self.covidData = self.covidData[covidData.length-1];
-			console.log(self.covidData);
+			
+			//all metro dates data for weekly usage chart, append timezone for correct date encoding / decoding
+			self.allMetroData = self.metroData.map( d => {
+				d.date = d.date + " EST";
+				return d;
+			});
 
+			console.log(self.allMetroData);
+			// FOR NOW, ONLY USE THE MOST RECENT DATE (IN ORDER TO TEST AND SET UP THE MAIN MAP VISUALIZATION)
+			self.metroData = self.metroData.filter( record => record.date=="2020-10-14 EST");
+			self.covidData = self.covidData[covidData.length-1];
+			
 			createVis();
 		});
 	});
@@ -31,4 +38,5 @@ function loadData() {
 function createVis() {
 	// Instantiate visualization
 	stationMap = new StationMap("station-map", metroData, covidData, [40.7300, -73.7800])
+	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", allMetroData, "2020-10-14 EST");
 }
