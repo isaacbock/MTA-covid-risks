@@ -33,7 +33,7 @@ function loadData() {
 			// FOR NOW, ONLY USE THE MOST RECENT DATE (IN ORDER TO TEST AND SET UP THE MAIN MAP VISUALIZATION)
 			self.metroData = self.metroData.filter( record => record.date=="2020-10-14 EST");
 			self.covidData = self.covidData[covidData.length-1];
-			
+
 			createVis();
 		});
 	});
@@ -71,8 +71,6 @@ function selectStations(stations) {
 	$("#current-stations").html(stationsString);
 
 	// update other visualizations
-	if (stations.length > 0){
-		covidRisk.wrangleData(stations);
-		weeklyUsageChart.changeStation(stations);
-	}
+	covidRisk.wrangleData(stations);
+	weeklyUsageChart.wrangleData(stations);
 }

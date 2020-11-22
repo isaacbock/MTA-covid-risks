@@ -14,8 +14,6 @@ WeeklyUsageChart = function(_parentElement, _metroData, _endDate) {
 
 	this.selectedStations = [];
 
-	L.Icon.Default.imagePath = 'images/';
-
 	this.initVis();
 }
 
@@ -35,8 +33,8 @@ WeeklyUsageChart.prototype.initVis = function() {
        	.append("g")
 		.attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")")
 	
-	// Initialize Scales and Axex
-	vis.heightScale = d3.scaleLinear().range([vis.height, 10]);
+	// Initialize Scales and Axes
+	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
 	vis.xScale = d3.scaleTime().range([0, vis.width - vis.barWidth-20]);
 
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
@@ -45,7 +43,7 @@ WeeklyUsageChart.prototype.initVis = function() {
 	vis.wrangleData();
 }
 
-WeeklyUsageChart.prototype.wrangleData = function() {
+WeeklyUsageChart.prototype.wrangleData = function(_selectedStations) {
 	var vis = this;
 
 	//filter data to dates of interest
@@ -54,36 +52,32 @@ WeeklyUsageChart.prototype.wrangleData = function() {
 		return vis.startDate <= dateObj && dateObj <= vis.endDate;
 	})
 
-	//aggregate station usage by date and stations
-	// {
-	// 	yyyy-mm-dd EST: 
-	//	{	
-	//		date: Date object
-	// 		total: 1000,
-	// 		station1: 10,
-	// 		station2: 25,
-	// 		...
-	// 	}
-	//	...
-	// }
+	if (_selectedStations != undefined && _selectedStations.length != 0) {
+		let data = vis.filteredData;
+		vis.filteredData = [];
+		_selectedStations.forEach(station => {
+			data.forEach(d => {
+				if (station.latitude===d.gtfs_latitude && station.longitude===d.gtfs_longitude) {
+					vis.filteredData.push(d);
+				}
+			});
+		});
+	}
 
-	const aggregatedData = {};
-	vis.filteredData.forEach(element => {
-		const totalSofar = aggregatedData[element.date]?.total ? +aggregatedData[element.date]?.total : 0;
-		const stationVisitors = +element.entries + +element.exits;
-		aggregatedData[element.date] = {
-			...aggregatedData[element.date],
-			date: new Date(element.date),
-			total: totalSofar + stationVisitors,
-			[element.stop_name]: stationVisitors,
-		}
+	vis.aggregateData = []
+
+	for (let d = new Date(vis.startDate); d <= vis.endDate; d.setDate(d.getDate() + 1)) {
+		let date = new Date(d)
+		vis.aggregateData.push({date: date, entries: 0, exits: 0});
+	}
+
+	vis.aggregateData.forEach((date, index) => {
+		let relevantStations = vis.filteredData.filter(station => new Date(station.date).getTime()===date.date.getTime());
+		relevantStations.forEach(station => {
+			vis.aggregateData[index].entries += parseInt(station.entries);
+			vis.aggregateData[index].exits += parseInt(station.exits);
+		});
 	});
-	
-	// concert json to array for d3
-	vis.aggregatedDataArray = [];
-	Object.keys(aggregatedData).forEach(k => {
-		vis.aggregatedDataArray.push(aggregatedData[k]);
-	})
 
 	// Set scale domain based on filtered data and station
 	vis.setScaleDomain();
@@ -96,30 +90,29 @@ WeeklyUsageChart.prototype.wrangleData = function() {
 WeeklyUsageChart.prototype.updateVis = function() {
 	vis = this;
 
-	var selection = vis.svg.selectAll("rect").data(vis.aggregatedDataArray);
+	var selection = vis.svg.selectAll("rect").data(vis.aggregateData);
 
 	//constants for styling
 	const color = "grey";
 
-	//update
-	selection
-	.attr("width", vis.barWidth)
-	.attr("x", (d)=> vis.xScale(d.date))
-	.attr("y", d => {
-		return vis.height - vis.heightScale(vis.usageDataOfInterest(d));
-	})
-	.attr("fill", color)
-	.attr("height", d => vis.heightScale(vis.usageDataOfInterest(d)));
-
 	//enter 
 	selection.enter().append("rect")
 	.attr("width", vis.barWidth)
-	.attr("x", (d)=> vis.xScale(d.date))
+	.attr("x", (d) => vis.xScale(d.date))
 	.attr("y", d => {
-		return vis.height - vis.heightScale(vis.usageDataOfInterest(d));
+		return vis.heightScale(d.entries + d.exits);
 	})
 	.attr("fill", color)
-	.attr("height", d => vis.heightScale(vis.usageDataOfInterest(d)));
+	.attr("height", d => vis.height - vis.heightScale(d.entries + d.exits));
+
+	//update
+	selection
+	.transition()
+	.duration(1000)
+	.attr("y", d => {
+		return vis.heightScale(d.entries + d.exits);
+	})
+	.attr("height", d => vis.height - vis.heightScale(d.entries + d.exits));
 
 	//exit
 	selection.exit().remove();
@@ -131,8 +124,9 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	vis.svg.append("g")
 	.attr("class", "axis y-axis")
 	.attr("transform", "translate(0, 0)")
+	.transition()
+	.duration(1000)
 	.call(vis.yAxis)
-	console.log(vis.yAxis.scale().domain())
 	vis.svg.append("g")
 	.attr("class", "axis x-axis")
 	.attr("transform", "translate(0, 70)")
@@ -152,27 +146,12 @@ WeeklyUsageChart.prototype.changeStation = function(stations){
 WeeklyUsageChart.prototype.setScaleDomain = function(){
 	vis = this;
 	this.heightScale.domain([
-		d3.min(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d)),
-		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
-	])
+		0,
+		d3.max(vis.aggregateData, d => d.entries + d.exits)
+	]);
 
-	this.xScale.domain([vis.startDate, vis.endDate])
+	this.xScale.domain([vis.startDate, vis.endDate]);
 
 	this.yAxis.scale(this.heightScale);
 	this.xAxis.scale(this.xScale);
 }
-
-//get usage data of interest (all, or specific station's)
-WeeklyUsageChart.prototype.usageDataOfInterest = function(d) {
-	if(this.selectedStations.length === 0){
-		return d.total;
-	}
-	let usage = 0;
-	Object.keys(d).forEach(name => {
-		if(this.selectedStations.includes(name)){
-			usage += d[name];
-		}
-	})
-	return usage;
-}
-
