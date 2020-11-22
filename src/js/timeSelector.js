@@ -17,7 +17,7 @@ TimeSelector = function(_parentElement, _defaultOptions) {
 
 
 /*
- *  Initialize station map
+ *  Initialize time overlay
  */
 
 TimeSelector.prototype.initVis = function() {
@@ -25,7 +25,6 @@ TimeSelector.prototype.initVis = function() {
     
     vis.currentDate = $("#current-date");
     vis.currentTime = $("#current-time");
-    vis.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     vis.stationsCheckbox = $("#show-stations");
     vis.linesCheckbox = $("#show-lines");
@@ -65,8 +64,8 @@ TimeSelector.prototype.updateVis = function() {
     var vis = this;
 
     let now = new Date();
-    let currentDate = vis.months[now.getMonth()] + " " + now.getDate() + ", " + now.getFullYear();
-    let currentTime = now.getHours()%12 + ":" + (now.getMinutes().toString().length==1 ? ("0"+now.getMinutes()) : now.getMinutes()) + (now.getHours()<12 ? "am EST":"pm EST");
+    let currentDate = now.toLocaleString('en', {month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+    let currentTime = now.toLocaleString('en', {hour: "numeric", minute: "numeric", timeZoneName: "short", hour12: true, timeZone: "America/New_York" });
     vis.currentDate.text(currentDate);
     vis.currentTime.text(currentTime);
 

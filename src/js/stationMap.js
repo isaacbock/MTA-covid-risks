@@ -127,6 +127,8 @@ StationMap.prototype.updateVis = function() {
 			.bindTooltip(popupContent)
 			.addTo(vis.map);
 		marker.name = station.stop_name;
+		marker.latitude = station.gtfs_latitude;
+		marker.longitude = station.gtfs_longitude;
 		marker.selected = false;
 		marker.on('click', onStationClick);
 		vis.allStations.push(marker);
@@ -136,17 +138,17 @@ StationMap.prototype.updateVis = function() {
 			// select station
 			if (!station.selected) {
 				station.selected = true;
-				vis.selectedStations.push(station.name)
+				vis.selectedStations.push({name: station.name, latitude: station.latitude, longitude: station.longitude});
 			}
 			// else deselect station
 			else {
 				station.selected = false;
-				vis.selectedStations = vis.selectedStations.filter(name => name!==station.name)
+				vis.selectedStations = vis.selectedStations.filter(d => d.latitude!==station.latitude && d.longitude!==station.longitude);
 			}
 			// if some stations are selected, the rest should be somewhat desaturated for contrast
 			if (vis.selectedStations.length!=0) {
 				vis.allStations.forEach(station => {
-					if (vis.selectedStations.includes(station.name)) {
+					if (vis.selectedStations.some(d => d.name===station.name && d.latitude===station.latitude && d.longitude===station.longitude)) {
 						$(station._icon).removeClass("unselected");
 					}
 					else {

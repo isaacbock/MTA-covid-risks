@@ -2,6 +2,7 @@ body {
 	margin: 0;
 	font-family: 'Montserrat', sans-serif;
 	letter-spacing: 2px;
+	width: 100vw;
 	overflow: hidden;
 }
 h1 {
@@ -21,6 +22,32 @@ p {
 	margin: 0;
 	margin-bottom: 10px;
 	margin-top: 10px;
+}
+button {
+	background-color: transparent;
+	border-radius: 30px;
+	border: none;
+	color: rgba(0, 0, 0, 0.50);
+	font-weight: bold;
+	cursor: pointer;
+}
+button.selected {
+	border: 2px solid #1E90FF;
+	color: white;
+	background-color: #1E90FF;
+}
+button:focus { 
+	outline:0 !important; 
+}
+
+.low {
+	color: rgb(0, 255, 0);
+}
+.medium {
+	color:rgb(255, 127, 0);
+}
+.high {
+	color: rgb(255, 0, 0);
 }
 
 #header {
@@ -55,19 +82,19 @@ p {
 	background-color: rgb(0, 255, 0);
 }
 .station-marker.low.unselected {
-	background-color: hsl(120, 25%, 50%);
+	background-color: hsl(120, 35%, 50%);
 }
 .station-marker.medium {
 	background-color:rgb(255, 255, 0);
 }
 .station-marker.medium.unselected {
-	background-color:hsl(60, 25%, 50%);
+	background-color:hsl(60, 23%, 50%);
 }
 .station-marker.high {
 	background-color: rgb(255, 0, 0);
 }
 .station-marker.high.unselected {
-	background-color: hsl(0, 25%, 50%);
+	background-color: hsl(0, 35%, 50%);
 }
 
 #time-overlay {
@@ -128,9 +155,6 @@ p {
 }
 #covid-risk > h3, #station-map > h3 {
 	font-size: 25px;
-}
-#covid-risk-level {
-	color: red;
 }
 #covid-columns {
 	width: 100%;
