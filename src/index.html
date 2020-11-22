@@ -19,11 +19,31 @@
 <body>
 
 	<div id="header">
-		<h1>NYC Metro Live COVID-19 Risks</h1>
+		<h1>NYC Metro COVID-19 Risks</h1>
 		<a href="processBook.html">Process Book</a>
 	</div>
 
 	<div id="station-map"></div>
+
+	<div id="time-overlay">
+		<h1 id="current-date"></h1>
+		<h2 id="current-time"></h2>
+		<div>
+			<input type="checkbox" id="show-stations" name="Metro Stations">
+			<label for="show-stations">Metro Stations</label>
+		</div>
+		<div>
+			<input type="checkbox" id="show-lines" name="Metro Lines">
+			<label for="show-lines">Metro Lines</label>
+		</div>
+		<div>
+			<input type="checkbox" id="show-COVID-rates" name="COVID Rates">
+		<label for="show-COVID-rates">COVID-19 Rates</label>
+		</div>
+		
+	
+		
+	</div>
 
 	<div id="detail-overlay">
 		<h2 id="current-stations">All Stations</h2>
@@ -67,6 +87,7 @@
 	<!-- Visualization objects -->
 	<script src="js/stationMap.js"></script>
 	<script src="js/weeklyUsageChart.js"></script>
+	<script src="js/timeSelector.js"></script>
 	<!-- Load data, create visualizations -->
 	<script src="js/main.js"></script>
 </body>

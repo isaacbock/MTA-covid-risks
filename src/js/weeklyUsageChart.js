@@ -12,8 +12,7 @@ WeeklyUsageChart = function(_parentElement, _metroData, _endDate) {
 	this.endDate = new Date(_endDate);
 	this.startDate = getDateDaysAgo(this.endDate, 6);
 
-	//default to all stations first
-	this.station = "all";
+	this.selectedStations = [];
 
 	L.Icon.Default.imagePath = 'images/';
 
@@ -37,6 +36,7 @@ WeeklyUsageChart.prototype.initVis = function() {
 	
 	// Initialize Scale
 	vis.heightScale = d3.scaleLinear().range([vis.height, 10]);
+	
 	vis.wrangleData();
 }
 
@@ -99,7 +99,7 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	const color = "grey";
 
 	//update
-	selection.append("rect")
+	selection
 	.attr("width", barWidth)
 	.attr("x", (d,i)=>i*xOffset)
 	.attr("y", d => {
@@ -117,17 +117,18 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	})
 	.attr("fill", color)
 	.attr("height", d => vis.heightScale(vis.usageDataOfInterest(d)));
-	
+
 	//exit
 	selection.exit().remove();
 
-	//draw axis and labels
-	
+	//TODO draw axis and labels
+
 }
 
-WeeklyUsageChart.prototype.changeStation = function(stationName){
-	this.station = stationName;
+WeeklyUsageChart.prototype.changeStation = function(stations){
+	this.selectedStations = stations;
 	this.setScaleDomain();
+	this.updateVis();
 }
 
 WeeklyUsageChart.prototype.setScaleDomain = function(){
@@ -141,6 +142,15 @@ WeeklyUsageChart.prototype.setScaleDomain = function(){
 
 //get usage data of interest (all, or specific station's)
 WeeklyUsageChart.prototype.usageDataOfInterest = function(d) {
-	return this.station === "all" ? d.total : d[this.station];
+	if(this.selectedStations.length === 0){
+		return d.total;
+	}
+	let usage = 0;
+	Object.keys(d).forEach(name => {
+		if(this.selectedStations.includes(name)){
+			usage += d[name];
+		}
+	})
+	return usage;
 }
 

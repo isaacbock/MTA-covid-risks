@@ -2,15 +2,21 @@
 /*
  *  StationMap - Object constructor function
  *  @param _parentElement   -- HTML element in which to draw the visualization
- *  @param _data            -- Array with all stations of the bike-sharing network
+ *  @param _metroData		-- Array with all metro stations of the MTA
+ *  @param _covidData  		-- Array with all zip code COVID-19 rates
+ *  @param _mapPosition   	-- Geographic center of NYC
+ * 	@param _defaultOptions  -- Array of default display options
  */
 
-StationMap = function(_parentElement, _metroData, _covidData, _mapPosition) {
+StationMap = function(_parentElement, _metroData, _covidData, _mapPosition, _defaultOptions) {
 
 	this.parentElement = _parentElement;
 	this.metroData = _metroData;
 	this.covidData = _covidData;
-	this.mapPosition = _mapPosition
+	this.mapPosition = _mapPosition;
+	this.showStations = _defaultOptions[0];
+	this.showLines = _defaultOptions[1];
+	this.showCOVID = _defaultOptions[2];
 
 	L.Icon.Default.imagePath = 'images/';
 
@@ -24,6 +30,9 @@ StationMap = function(_parentElement, _metroData, _covidData, _mapPosition) {
 
 StationMap.prototype.initVis = function() {
 	var vis = this;
+
+	vis.allStations = [];
+	vis.selectedStations = [];
 	
 	vis.map = L.map(vis.parentElement, {zoomControl: false}).setView(vis.mapPosition, 11);
 	L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}', {
@@ -33,6 +42,12 @@ StationMap.prototype.initVis = function() {
 		maxZoom: 16,
 		ext: 'png'
 	}).addTo(vis.map);
+
+	// Pane layers for filtering views
+	vis.map.createPane('COVID');
+	vis.map.createPane('lines');
+	vis.map.createPane('stations');
+
 	// Move zoom controller to bottom left corner
 	L.control.zoom({
 		position: 'bottomleft'
@@ -73,9 +88,6 @@ StationMap.prototype.wrangleData = function() {
 StationMap.prototype.updateVis = function() {
 	var vis = this;
 
-	// Add empty layer groups for the markers / map objects
-	let stations = L.layerGroup().addTo(vis.map);
-	
 	vis.metroData.forEach(station => {
 		// Popup content
 		let popupContent = "<strong>"+ station.stop_name +"</strong><br/>";
@@ -110,11 +122,46 @@ StationMap.prototype.updateVis = function() {
 		}
 		
 		// Plot markers
-		let marker = L.marker([station.gtfs_latitude, station.gtfs_longitude], { icon: icon})
+		let marker = L.marker([station.gtfs_latitude, station.gtfs_longitude], { icon: icon, pane: 'stations'})
 			// .bindPopup(popupContent)
 			.bindTooltip(popupContent)
 			.addTo(vis.map);
-		stations.addLayer(marker)
+		marker.name = station.stop_name;
+		marker.selected = false;
+		marker.on('click', onStationClick);
+		vis.allStations.push(marker);
+
+		function onStationClick(e) {
+			let station = e.target;
+			// select station
+			if (!station.selected) {
+				station.selected = true;
+				vis.selectedStations.push(station.name)
+			}
+			// else deselect station
+			else {
+				station.selected = false;
+				vis.selectedStations = vis.selectedStations.filter(name => name!==station.name)
+			}
+			// if some stations are selected, the rest should be somewhat desaturated for contrast
+			if (vis.selectedStations.length!=0) {
+				vis.allStations.forEach(station => {
+					if (vis.selectedStations.includes(station.name)) {
+						$(station._icon).removeClass("unselected");
+					}
+					else {
+						$(station._icon).addClass("unselected");
+					}
+				});
+			}
+			// else if no stations are selected, all should be displayed in full color
+			else {
+				vis.allStations.forEach(station => {
+					$(station._icon).removeClass("unselected");
+				});
+			}
+			selectStations(vis.selectedStations);
+		}
 	});
 
 	// Scale markers on zoom, adapted from https://stackoverflow.com/a/46016693
@@ -137,16 +184,9 @@ StationMap.prototype.updateVis = function() {
 	// Add zip code overlays
 	L.geoJson(vis.modZCTA, {
 		style: styleZipCode,
-		weight: 1
+		weight: 0,
+		pane: "COVID"
 	}).addTo(vis.map);
-
-	// Add MTA lines
-	L.geoJson(vis.subwayLines, {
-		style: styleMBTALine,
-		weight: 7,
-		opacity: 1
-	}).addTo(vis.map);
-
 	// Color zip codes by covid rates
 	function styleZipCode(feature) {
 		let zipCode = feature.properties.MODZCTA;
@@ -154,24 +194,32 @@ StationMap.prototype.updateVis = function() {
 		let covidRate = vis.covidData[lookupKey];
 		
 		if (covidRate >= 5) {
-			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .9, interactive: false };
+			return { fillColor: "#00308F", fillOpacity: .9, interactive: false };
 		}
 		else if (covidRate >= 4) {
-			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .7, interactive: false };
+			return { fillColor: "#0643A5", fillOpacity: .75, interactive: false };
 		}
 		else if (covidRate >= 3) {
-			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .5, interactive: false };
+			return { fillColor: "#0C56BC", fillOpacity: .6, interactive: false };
 		}
 		else if (covidRate >= 2) {
-			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .3, interactive: false };
+			return { fillColor: "#126AD2", fillOpacity: .45, interactive: false };
 		}
 		else if (covidRate >= 1) {
-			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .2, interactive: false };
+			return { fillColor: "#187DE9", fillOpacity: .2, interactive: false };
 		}
 		else {
-			return { fillColor: "rgb(51, 136, 255)", fillOpacity: .1, interactive: false };
+			return { fillColor: "#1E90FF", fillOpacity: .1, interactive: false };
 		}
 	}
+
+	// Add MTA lines
+	L.geoJson(vis.subwayLines, {
+		style: styleMBTALine,
+		weight: 7,
+		opacity: 1,
+		pane: "lines"
+	}).addTo(vis.map);
 	// MTA line colors via http://web.mta.info/developers/resources/line_colors.htm
 	function styleMBTALine(feature) {
 		let station = feature.properties.name;
@@ -207,4 +255,36 @@ StationMap.prototype.updateVis = function() {
 		}
 	}
 
+	vis.toggleLayers(vis.showStations, vis.showLines, vis.showCOVID);
+
+}
+
+/*
+ *  Toggle layers
+ *  @param _showStations  	-- Boolean to show or hide MTA stations
+ *  @param _showLines   	-- Boolean to show or hide MTA lines
+ * 	@param _showCOVID  		-- Boolean to show or hide COVID data by zip code
+ */
+
+StationMap.prototype.toggleLayers = function(_showStations, _showLines, _showCOVID) {
+	var vis = this;
+
+	if (_showStations) {
+		vis.map.getPane('stations').style.display = "block";
+	}
+	else {
+		vis.map.getPane('stations').style.display = "none";
+	}
+	if (_showLines) {
+		vis.map.getPane('lines').style.display = "block";
+	}
+	else {
+		vis.map.getPane('lines').style.display = "none";
+	}
+	if (_showCOVID) {
+		vis.map.getPane('COVID').style.display = "block";
+	}
+	else {
+		vis.map.getPane('COVID').style.display = "none";
+	}
 }

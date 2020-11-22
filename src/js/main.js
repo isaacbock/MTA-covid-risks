@@ -1,9 +1,15 @@
 
 var metroData = [];
-var covidData = []
+var covidData = [];
 
 // Variable for the visualization instance
 var stationMap;
+var timeSelector;
+var weeklyUsageChart;
+// Default options
+var showStations = true;
+var showLines = false;
+var showCOVID = true;
 
 // Start application by loading the data
 loadData();
@@ -37,6 +43,35 @@ function loadData() {
 
 function createVis() {
 	// Instantiate visualization
-	stationMap = new StationMap("station-map", metroData, covidData, [40.7300, -73.7800])
+	stationMap = new StationMap("station-map", metroData, covidData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
 	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", allMetroData, "2020-10-14 EST");
+	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
+}
+
+function toggleLayers(stations, lines, covid) {
+	showStations = stations;
+	showLines = lines;
+	showCOVID = covid;
+	stationMap.toggleLayers(showStations, showLines, showCOVID);
+}
+
+function selectStations(stations) {
+
+	// update text label
+	let stationsString = "All Stations";
+	if (stations.length>0) {
+		stationsString = "";
+		stations.forEach(station => {
+			stationsString += station;
+			if (station!=stations[stations.length-1]) {
+				stationsString += ", <br>";
+			}
+		});
+	}
+	$("#current-stations").html(stationsString);
+
+	// TO-DO: update other visualizations
+	if(stations.length >0){
+		weeklyUsageChart.changeStation(stations);
+	}
 }
