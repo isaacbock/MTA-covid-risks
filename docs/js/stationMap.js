@@ -54,7 +54,7 @@ StationMap.prototype.initVis = function() {
 	}).addTo(vis.map);
 
 	// MTA Subway Line Data via https://data.cityofnewyork.us/Transportation/Subway-Lines/3qz8-muuu
-	$.getJSON("data/SubwayLines.geoJson", function(lineData) {
+	$.getJSON("data/SubwayLines.geo.Json", function(lineData) {
 		// NYC Zip Codes via XXXXX
 		$.getJSON("data/modzcta.geo.json", function(neighborhoodData) {
 			vis.subwayLines = lineData;
