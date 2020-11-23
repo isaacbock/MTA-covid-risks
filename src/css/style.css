@@ -17,6 +17,7 @@ h2 {
 h4 {
 	text-align: center;
 	margin-top: 5px;
+	margin-bottom: 5px;
 }
 p {
 	margin: 0;
@@ -30,6 +31,7 @@ button {
 	color: rgba(0, 0, 0, 0.50);
 	font-weight: bold;
 	cursor: pointer;
+	transition: background-color .3s;
 }
 button.selected {
 	border: 2px solid #1E90FF;
@@ -41,7 +43,7 @@ button:focus {
 }
 
 .low {
-	color: rgb(0, 255, 0);
+	color: hsl(120, 100%, 40%)
 }
 .medium {
 	color:rgb(255, 127, 0);
@@ -79,7 +81,7 @@ button:focus {
 	box-shadow: 0px 0px 10px black;
 }
 .station-marker.low {
-	background-color: rgb(0, 255, 0);
+	background-color: rgb(0,255,0);
 }
 .station-marker.low.unselected {
 	background-color: hsl(120, 35%, 50%);
@@ -110,9 +112,6 @@ button:focus {
 	justify-content: start;
 	overflow: scroll;
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
-}
-#time-overlay > h1  {
-
 }
 #time-overlay > h2  {
 	margin-bottom: 20px;
@@ -159,11 +158,17 @@ button:focus {
 #covid-columns {
 	width: 100%;
 	display: flex;
-	justify-content: space-around;
+	justify-content: space-evenly;
 	margin-bottom: 20px;
+	margin-left: 15px;
 }
 #covid-columns > * {
 	width: 40%;
+}
+.topLabel {
+	text-anchor: middle;
+	font-size: 12px;
+	font-weight: bold;
 }
 #crowd-rates {
 	text-align: center;

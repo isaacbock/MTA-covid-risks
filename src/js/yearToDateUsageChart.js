@@ -146,6 +146,11 @@ YearToDateUsageChart.prototype.setScaleDomain = function(){
 
 	vis.xScale.domain([vis.aggregatedDataArray[0].date, vis.endDate])
 
+	vis.area = d3.area()
+	.x(d => vis.xScale(d.date))
+	.y0(vis.height)
+	.y1(d => vis.heightScale(vis.usageDataOfInterest(d)))
+
 	vis.yAxis.scale(this.heightScale);
 	vis.xAxis.scale(this.xScale);
 }

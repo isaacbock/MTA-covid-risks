@@ -32,6 +32,8 @@ function loadData() {
 
 			// FOR NOW, ONLY USE THE MOST RECENT DATE (IN ORDER TO TEST AND SET UP THE MAIN MAP VISUALIZATION)
 			self.metroData = self.metroData.filter( record => record.date=="2020-10-14 EST");
+			// Remove stations outside of NYC
+			self.metroData = self.metroData.filter( record => record.stop_name!="Newark Penn Station" && record.stop_name!="Harrison" && record.stop_name!="Journal Sq" && record.stop_name!="Grove St" && record.stop_name!="Pavonia/Newport" && record.stop_name!="Hoboken" && record.stop_name!="Exchange Pl");
 			self.covidData = self.covidData[covidData.length-1];
 
 			createVis();
@@ -45,9 +47,8 @@ function createVis() {
 	stationMap = new StationMap("station-map", metroData, covidData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
 	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", allMetroData, "2020-10-14 EST");
 	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
-	covidRisk = new CovidRisk("covid-risk", covidData);
 	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", allMetroData, "2020-11-13 EST");
-
+	covidRisk = new CovidRisk("covid-risk", "positivity-rates", covidData);
 }
 
 function toggleLayers(stations, lines, covid) {
