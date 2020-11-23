@@ -7,7 +7,7 @@ var stationMap;
 var timeSelector;
 var covidRisk;
 var weeklyUsageChart;
-
+var yearToDateUsageChart;
 // Default options
 var showStations = true;
 var showLines = false;
@@ -46,6 +46,8 @@ function createVis() {
 	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", allMetroData, "2020-10-14 EST");
 	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
 	covidRisk = new CovidRisk("covid-risk", covidData);
+	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", allMetroData, "2020-11-13 EST");
+
 }
 
 function toggleLayers(stations, lines, covid) {
@@ -72,5 +74,6 @@ function selectStations(stations) {
 
 	// update other visualizations
 	covidRisk.wrangleData(stations);
-	weeklyUsageChart.wrangleData(stations);
+	weeklyUsageChart.changeSelectedStations(stations);
+	yearToDateUsageChart.changeSelectedStations(stations);
 }

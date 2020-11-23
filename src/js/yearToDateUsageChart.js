@@ -5,12 +5,11 @@
  *  @param endDate      -- String represents date of interest
  */
 
-WeeklyUsageChart = function(_parentElement, _metroData, _endDate) {
+YearToDateUsageChart = function(_parentElement, _metroData, _endDate) {
 
 	this.parentElement = _parentElement;
 	this.metroData = _metroData;
 	this.endDate = new Date(_endDate);
-	this.startDate = getDateDaysAgo(this.endDate, 6);
 
 	this.selectedStations = [];
 
@@ -19,7 +18,7 @@ WeeklyUsageChart = function(_parentElement, _metroData, _endDate) {
 	this.initVis();
 }
 
-WeeklyUsageChart.prototype.initVis = function() {
+YearToDateUsageChart.prototype.initVis = function() {
     var vis = this;
 
     vis.margin = { top: 40, right: 0, bottom: 40, left: 60 };
@@ -27,32 +26,39 @@ WeeklyUsageChart.prototype.initVis = function() {
 	vis.width = 400 - vis.margin.left - vis.margin.right,
     vis.height = 150 - vis.margin.top - vis.margin.bottom;
 
-	vis.barWidth = 30;
   	// SVG drawing area
 	vis.svg = d3.select("#" + vis.parentElement).append("svg")
 	    .attr("width", vis.width + vis.margin.left + vis.margin.right)
 		.attr("height", vis.height + vis.margin.top + vis.margin.bottom)
        	.append("g")
 		.attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")")
-	
+
 	// Initialize Scales and Axex
 	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
-	vis.xScale = d3.scaleTime().range([0, vis.width - vis.barWidth-20]);
+	vis.xScale = d3.scaleTime().range([0, vis.width]);
 
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
+	
+	// Area and Path
+	vis.path = vis.svg.append("path")
+		.attr("class", "area");
+
+	vis.area = d3.area()
+	.x(d => vis.xScale(d.date))
+	.y0(vis.height)
+	.y1(d => vis.heightScale(vis.usageDataOfInterest(d)))
+
+	vis.area.curve(d3.curveCardinal);
 
 	vis.wrangleData();
 }
 
-WeeklyUsageChart.prototype.wrangleData = function() {
+YearToDateUsageChart.prototype.wrangleData = function() {
 	var vis = this;
 
 	//filter data to dates of interest
-	vis.filteredData = vis.metroData.filter(d => {
-		const dateObj = new Date(d.date);
-		return vis.startDate <= dateObj && dateObj <= vis.endDate;
-	})
+	vis.filteredData = vis.metroData;
 
 	//aggregate station usage by date and stations
 	// {
@@ -93,35 +99,18 @@ WeeklyUsageChart.prototype.wrangleData = function() {
 
 }
 
-WeeklyUsageChart.prototype.updateVis = function() {
+YearToDateUsageChart.prototype.updateVis = function() {
 	vis = this;
 
-	var selection = vis.svg.selectAll("rect").data(vis.aggregatedDataArray);
+	//var selection = vis.svg.selectAll("rect").data(vis.aggregatedDataArray);
 
 	//constants for styling
 	const color = "grey";
 
-	//enter
-	selection.enter().append("rect")
-	.attr("width", vis.barWidth)
-	.attr("x", (d)=> vis.xScale(d.date))
-	.attr("fill", color)
-	.attr("height", d => vis.height - vis.heightScale(vis.usageDataOfInterest(d)))
-	.attr("y", d => {
-		return vis.heightScale(vis.usageDataOfInterest(d));
-	});
-
-	//update
-	selection.
-	transition()
-	.duration(200)
-	.attr("y", d => {
-		return vis.heightScale(vis.usageDataOfInterest(d));
-	})
-	.attr("height", d => vis.height - vis.heightScale(vis.usageDataOfInterest(d)));
-
-	//exit
-	selection.exit().remove();
+	vis.path
+	.datum(vis.aggregatedDataArray)
+	.transition()
+	.attr("d", vis.area);
 
 	//TODO draw axis and labels
 	vis.svg.selectAll(".y-axis").remove();
@@ -142,30 +131,27 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	.attr("transform", "rotate(-45)")
 }
 
-WeeklyUsageChart.prototype.changeSelectedStations = function(stations){
+YearToDateUsageChart.prototype.changeSelectedStations = function(stations){
 	this.selectedStations = stations;
-	console.log(stations);
 	this.setScaleDomain();
 	this.updateVis();
 }
 
-WeeklyUsageChart.prototype.setScaleDomain = function(){
+YearToDateUsageChart.prototype.setScaleDomain = function(){
 	vis = this;
 	vis.heightScale.domain([
 		0,
 		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
 	])
 
-	console.log(vis.heightScale.domain());
-
-	vis.xScale.domain([vis.startDate, vis.endDate])
+	vis.xScale.domain([vis.aggregatedDataArray[0].date, vis.endDate])
 
 	vis.yAxis.scale(this.heightScale);
 	vis.xAxis.scale(this.xScale);
 }
 
 //get usage data of interest (all, or specific station's)
-WeeklyUsageChart.prototype.usageDataOfInterest = function(d) {
+YearToDateUsageChart.prototype.usageDataOfInterest = function(d) {
 	if(this.selectedStations.length === 0){
 		return d.total;
 	}
