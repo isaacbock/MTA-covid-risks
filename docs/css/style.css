@@ -113,7 +113,7 @@ button:focus {
 	display: flex;
 	flex-direction: column;
 	justify-content: start;
-	overflow: scroll;
+	/* overflow: scroll; */
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
 }
 #time-overlay > h2  {
@@ -123,15 +123,15 @@ button:focus {
 }
 
 #detail-overlay {
-	width: 500px;
+	width: 480px;
 	max-width: 90vw;
 	height: calc(100vh - 70px - 20px - 20px - 30px);
 	position: absolute;
 	top: 90px;
-	right: -20px;
+	right: 0px;
 	color: white;
 	background-color: rgba(35, 35, 35, 0.97);
-	border-radius: 20px;
+	border-radius: 20px 0 0 20px;
 	z-index: 99;
 	padding-top: 10px;
 	padding-left: 40px;
@@ -139,10 +139,15 @@ button:focus {
 	flex-direction: column;
 	justify-content: start;
 	overflow: scroll;
+	-ms-overflow-style: none;
+  	scrollbar-width: none;
 }
 #detail-overlay > h2 {
 	padding-left: 10px;
 	padding-right: 40px;
+}
+#detail-overlay::-webkit-scrollbar {
+	display: none;
 }
 #covid-risk, #station-usage {
 	background-color: white;
