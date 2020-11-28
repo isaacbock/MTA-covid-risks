@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="">
+	<title>NYC Metro Live COVID-19 Risks</title>
+
+	<!-- Load Google Font -->
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+	<!-- Prevent Indexing -->
+	<meta name="robots" content="noindex">
+
+	<!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+	<link rel="stylesheet" href="css/leaflet.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+	<div id="header">
+		<h1>NYC Metro COVID-19 Risks</h1>
+		<a href="processBook.html">Process Book</a>
+	</div>
+
+	<div id="station-map"></div>
+
+	<div id="time-overlay">
+		<h1 id="current-date"></h1>
+		<h2 id="current-time"></h2>
+		<div>
+			<input type="checkbox" id="show-stations" name="Metro Stations">
+			<label for="show-stations">Metro Stations</label>
+		</div>
+		<div>
+			<input type="checkbox" id="show-lines" name="Metro Lines">
+			<label for="show-lines">Metro Lines</label>
+		</div>
+		<div>
+			<input type="checkbox" id="show-COVID-rates" name="COVID Rates">
+		<label for="show-COVID-rates">COVID-19 Rates</label>
+		</div>
+		
+	
+		
+	</div>
+
+	<div id="detail-overlay">
+		<h2 id="current-stations">All Stations</h2>
+		<div id="covid-risk">
+			<h3><span id="covid-risk-level"></span> Local COVID-19 Risk</h3>
+			<div id="covid-columns">
+				<div id="positivity-rates">
+					<h4>Positivity Rates</h4>
+				</div>
+				<div id="crowd-rates">
+					<div id="crowd-size-selector">
+						<p>In a crowd of </p>
+						<button>10</button>
+						<button>25</button>
+						<button>50</button>
+					</div>
+					<p>We estimate a <span id="crowd-risk-estimate"></span> chance<br>of 1+ positive case.</p>
+				</div>
+			</div>
+		</div>
+		<div id="station-usage">
+			<h3>Station Usage</h3>
+			<div>
+				<!-- <button>Daily Activity</button> -->
+				<!-- <button class="selected">Weekly Activity</button> -->
+			</div>
+			<div id="weekly-usage"></div>
+			<h3>Year-to-Date</h3>
+			<div id="year-to-date-usage"></div>
+		</div>
+	</div>
+
+	<!-- Load JS libraries -->
+	<script src="js/lib/jquery.min.js"></script>
+	<script src="js/lib/bootstrap.min.js"></script>
+	<script src="js/lib/d3.v6.min.js"></script>
+	<script src="js/lib/leaflet.js"></script>
+	
+	<!-- Utility libraries -->
+	<script src="js/dateTimeUtils.js"></script>
+	<script src="js/lib/turf.min.js"></script>
+
+	<!-- Visualization objects -->
+	<script src="js/stationMap.js"></script>
+	<script src="js/timeSelector.js"></script>
+	<script src="js/covidRisk.js"></script>
+	<script src="js/weeklyUsageChart.js"></script>
+	<script src="js/yearToDateUsageChart.js"></script>
+	<!-- Load data, create visualizations -->
+	<script src="js/main.js"></script>
+</body>
+</html>

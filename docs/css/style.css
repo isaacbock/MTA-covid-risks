@@ -1,0 +1,201 @@
+body {
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
+	letter-spacing: 2px;
+	width: 100vw;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+}
+h1 {
+	margin: 0;
+	font-weight: normal;
+	font-size: 25px;
+}
+h2 {
+	font-size: 30px;
+	font-weight: normal;
+}
+h4 {
+	text-align: center;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+p {
+	margin: 0;
+	margin-bottom: 10px;
+	margin-top: 10px;
+}
+button {
+	background-color: transparent;
+	border-radius: 30px;
+	border: none;
+	color: rgba(0, 0, 0, 0.50);
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color .3s;
+}
+button.selected {
+	border: 2px solid #1E90FF;
+	color: white;
+	background-color: #1E90FF;
+}
+button:focus { 
+	outline:0 !important; 
+}
+
+.low {
+	color: hsl(120, 100%, 40%)
+}
+.medium {
+	color:rgb(255, 127, 0);
+}
+.high {
+	color: rgb(255, 0, 0);
+}
+
+#header {
+	height: 50px;
+	background-color: rgb(35, 35, 35);
+	color: white;
+	padding: 10px;
+	padding-left: 30px;
+	display: flex;
+	align-items: center;
+}
+#header > a {
+	color: rgba(255, 255, 255, 0.5);
+	text-decoration: none;
+	margin-left: 40px;
+	margin-top: 5px;
+}
+#header > a:hover {
+	color: rgba(255, 255, 255, 0.9);
+}
+#station-map {
+	width: 100vw;
+	height: calc(100vh - 70px);
+	z-index: 98;
+}
+
+.station-marker {
+	border-radius: 50%;
+	box-shadow: 0px 0px 10px black;
+}
+.station-marker.low {
+	background-color: rgb(0,255,0);
+}
+.station-marker.low.unselected {
+	background-color: hsl(120, 35%, 50%);
+}
+.station-marker.medium {
+	background-color:rgb(255, 255, 0);
+}
+.station-marker.medium.unselected {
+	background-color:hsl(60, 23%, 50%);
+}
+.station-marker.high {
+	background-color: rgb(255, 0, 0);
+}
+.station-marker.high.unselected {
+	background-color: hsl(0, 35%, 50%);
+}
+
+#time-overlay {
+	position: absolute;
+	top: 90px;
+	left: 20px;
+	background-color: white;
+	border-radius: 20px;
+	z-index: 99;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	/* overflow: scroll; */
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+}
+#time-overlay > h2  {
+	margin-bottom: 20px;
+	margin-top: 5px;
+	font-weight: bold;
+}
+
+#detail-overlay {
+	width: 480px;
+	max-width: 90vw;
+	height: calc(100vh - 70px - 20px - 20px - 30px);
+	position: absolute;
+	top: 90px;
+	right: 0px;
+	color: white;
+	background-color: rgba(35, 35, 35, 0.97);
+	border-radius: 20px 0 0 20px;
+	z-index: 99;
+	padding-top: 10px;
+	padding-left: 40px;
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	overflow: scroll;
+	-ms-overflow-style: none;
+  	scrollbar-width: none;
+}
+#detail-overlay > h2 {
+	padding-left: 10px;
+	padding-right: 40px;
+}
+#detail-overlay::-webkit-scrollbar {
+	display: none;
+}
+#covid-risk, #station-usage {
+	background-color: white;
+	color: black;
+	width: 450px;
+	max-width: 90vw;
+	border-radius: 20px;
+	margin-bottom: 30px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+#covid-risk-level {
+	font-size: 23px;
+}
+#station-map > h3 {
+	font-size: 25px;
+}
+#covid-columns {
+	width: 100%;
+	display: flex;
+	justify-content: space-evenly;
+	margin-bottom: 20px;
+	margin-left: 15px;
+}
+#covid-columns > * {
+	width: 40%;
+}
+.topLabel {
+	text-anchor: middle;
+	font-size: 12px;
+	font-weight: bold;
+}
+#crowd-rates {
+	text-align: center;
+}
+#crowd-size-selector {
+	text-align: center;
+}
+#crowd-risk-estimate {
+	color: red;
+	font-weight: bold;
+	letter-spacing: 0px;
+}
+
+
+@media only screen and (max-width: 900px) {
+	#detail-overlay {
+		visibility: hidden;
+	}
+}

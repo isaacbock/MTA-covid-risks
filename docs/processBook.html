@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSE 457A Final Project Process Book</title>
+
+    <!-- Prevent Indexing -->
+    <meta name="robots" content="noindex">
+    
+    <link rel="stylesheet" href="css/processBookStyle.css">
+</head>
+<body>
+    <h4>CSE 457A Final Project Process Book | Group 14</h4>
+    <h1>LIVE NYC METRO USAGE & ASSOCIATED COVID RISKS.</h1>
+    <hr>
+    <p>Isaac Bock — <em>isaactbock@wustl.edu</em> - 466249</p>
+    <p>Ege Çavuşoğlu — <em>egecavusoglu@wustl.edu</em> - 463866</p>
+    <p>David Yang — <em>yang.david@wustl.edu</em> - 451666</p>
+    <a href="https://github.com/washuvis/nyccovid">Github Repository</a>
+
+    <h2>OVERVIEW</h2><hr>
+    <p>We are interested in visualizing live (weekly) traffic data within the NYC metro system in order to promote safe and socially distant travel. Using turnstile entry and exit counts, we plan to display how busy each station tends to be throughout the day, and cross-reference this traffic with community-level COVID-19 data to estimate the risk of utilizing each NYC metro station.</p>
+    
+    <h2>MOTIVATION & RELATED WORK</h2><hr>
+    <p>Our project was inspired by a <a href="https://covid19risk.biosci.gatech.edu/">Georgia Tech visualization of crowd-based COVID-19 risks</a>. Given current infection rates, even small groups of people are likely to contain positive cases, with high variability based on crowd size and location.</p>
+    <p>Although the Georgia Tech tool is effective at visualizing nation-wide trends, it lacks the specificity to shape local travel, which we wanted to expand upon and make more actionable for the general public.</p>
+    <p>Following the in-class bike station Leaflet.js studio, we decided that mapping NYC metro stations with live usage data and COVID-19 risk calculations could be an effective way to encourage this safer essential travel.</p>
+    <p>To calculate these COVID-19 risk statistics, we plan to use the same <a href="https://www.nature.com/articles/s41562-020-01000-9/">simple statistical model</a> developed and used by Georgia Tech to analyze crowd risks:</p>
+    <ul>
+        <li>"Let p denote the probability that a randomly selected individual in a focal population is infected. Hence, the probability that each of n individuals is not infected must be (1 − p)^n and by extension the probability that one (or more) individuals is infected must be 1 − (1 − p)^n; we define this as the event gathering risk."</li>
+    </ul>
+
+    <h2>QUESTIONS</h2><hr>
+    <p>Our visualization is entirely public-oriented and designed to help people best minimize the risk of any essential travel throughout NYC. As such, users will be able to answer the following questions when evaluating their travel plans:</p>
+    <ul>
+        <li>How busy is my station right now?</li>
+        <li>Would it be safer if I traveled at a different time or day of the week?</li>
+        <li>What are the current COVID-19 rates in the area?</li>
+        <li>How does this infection rate translate to my own personal risk of exposure in a group?</li>
+        <li>If I’m traveling through multiple stations, what is my average risk throughout the entire trip?</li>
+    </ul>
+    <p>Although we initially considered providing data for MTA officials making decisions about station usage, this may disproportionately affect those who rely on stations for traveling to essential businesses and places of work. Thus, our visualization is intended solely for individuals who use the MTA system during the COVID-19 pandemic. Furthermore, any available information and data trends should only be used to provide support (e.g. distributing masks to high-risk and most-visited stations) rather than removing it.</p>
+
+    <h2>DATA</h2><hr>
+    <h3>SOURCES</h3>
+    <ul>
+        <li><a href="http://web.mta.info/developers/turnstile.html">NYC MTA Turnstile Entry & Exit Counts</a></li>
+        <li><a href="https://qri.cloud/nyc-transit-data/turnstile_daily_counts_2020">NYC MTA Turnstile Aggregate Entry & Exit Counts</a></li>
+        <li><a href="https://github.com/nychealth/coronavirus-data/blob/master/trends/percentpositive-by-modzcta.csv">NYC COVID-19 Cases by Modified Zip Code Tabulation Area</a></li>
+        <li><a href="https://data.cityofnewyork.us/Transportation/Subway-Lines/3qz8-muuu">NYC MTA Subway Lines</a></li>
+        <li><a href="https://data.cityofnewyork.us/Health/Modified-Zip-Code-Tabulation-Areas-MODZCTA-/pri4-ifjk">NYC Modified Zip Code Tabulation Areas</a></li>
+    </ul>
+    <h3>CLEANING</h3>
+    <p>Raw data is processed within <em>nyccovid.py</em> to aggregate station values. The raw data is too large to include in our web app bundle, so we also filter out nonessential fields to minimize the file size. This cleaned data is saved within <em>metro.csv</em>. Our cleaning process draws from <a href="https://medium.com/qri-io/taming-the-mtas-unruly-turnstile-data-c945f5f96ba0">Taming the MTA’s Unruly Turnstile Data</a>, an article by Chris Whong that we used to generate our preliminary daily station count aggregates.</p>
+
+
+    <h2>EXPLORATORY DATA ANALYSIS</h2><hr>
+    <p>Although other visualizations do already exist for MTA metro usage, most focus on visualizing live train locations or travel at a city-wide level rather than station-specific safety metrics. Others only visualize data over a single day or week, and these alternative visualizations allowed us to identify general trends that could inform our own COVID-specific design.</p>
+    <ul>
+        <li><a href="http://piratefsh.github.io/mta-maps/public/">This animated visualization</a> shows that station usage varies by location throughout an average day. This consistent variation will allow our visualization to recommend ideal travel times and stations to users.</li>
+        <li><a href="http://arettines.com/MTA-Graphic">Another visualization</a> shows weekly turnstile patterns over an unspecified period of time. Some stations are much busier than others, even within relatively small geographic regions. This verifies that we can recommend least-busy nearby stations to users in a feasible and actionable manner.</li>
+        <li><a href="https://www1.nyc.gov/site/doh/covid/covid-19-data.page">This visualization</a> of COVID-19 rates throughout the city showed that some areas are much more affected than others, which indicates that avoiding local hotspot destinations might be an effective way to travel more safely.</li>
+    </ul>
+    <p>Our visualization will expand upon these prior visualizations by aggregating historical data over multiple periods of time (day, week, and year-to-date), while also displaying the current, most-recent data on map markers. Furthermore, we will incorporate live NYC COVID-19 rates to make predictions about the social distancing risks of passing through each station. These design additions and modifications can also be seen within our designs below.</p>
+
+    <h2>DESIGN EVOLUTION</h2><hr>
+    <h3>INITIAL DESIGNS.</h3>
+    <img alt="Initial Design 1" src="images/Sketch-David.png" width="750">
+    <p>One visualization design incorporates a time slider to visualize both COVID data (via zip code overlays) and station activity data (via markers) over time. Users could filter and simplify results based on metro line, and revenue estimates would allow government officials and the general population to view any spikes or dips in overall usage.</p><br>
+    <img alt="Initial Design 2" src="images/Sketch-Ege.png" width="750">
+    <p>A second design localizes COVID risks to color-coded station markers, and provides a detailed view of historic station activity throughout the day. This would allow users to make informed decisions about their own future travel plans. A more detailed economic activity portion also includes the percentage of total passengers passing through each station, providing a bigger-picture overview of station activity.</p><br>
+    <img alt="Initial Design 3" src="images/Sketch-Isaac.png" width="750">
+    <p>A third visualization design utilizes a metro map rather than a geographical map to display activity and COVID risk at each metro station, and provides easily-visible activity and risk estimates. Utilizing a simple statistical equation provided by Georgia Tech (see <em>Data Processing</em>), users are also provided with specific COVID risk details for differing crowd-sizes.</p><br>
+    <h3>FINAL PRELIMINARY DESIGN.</h3>
+    <img alt="Final Design" src="images/Final-Design.png" width="750">
+    <p>Our final design incorporates the best features of all of our preliminary designs. It includes a geographical map of stations, which will allow users to easily find stations near their current location. Color-coded markers and map overlays will provide details about local COVID rates and live activity. Interaction with station markers will provide information about hourly and daily traffic, allowing users to utilize less densely-populated travel times. A COVID-19 risk portion will provide detailed information about the risks of traveling through each specific station. An year-to-date visualization will display economic and traffic distribution trends, providing a larger-scale overview of travel and economic ramifications of the pandemic. Selecting multiple stations will display averages of the data, allowing users to test out different potential routes to find the safest option.</p><br>
+    <h3>MILESTONE 1 DESIGN.</h3>
+    <img alt="Milestone 1 Design" src="images/Milestone1.png" width="750">
+    <p>Our first milestone replicates our final preliminary design with a few slight modifications. First, it eliminates any direct visualization of economic activity in an effort to dissuade MTA closure of stations essential to the public. It also eliminates any direct statements of overall activity (such as “moderate activity”, which could be misleading to the public. Within our visualization, there is a large range of station activities, so this broad generalization could be dangerous. Our first milestone also adds a few interactive components (described below), and still requires additional completion and refinement of station activity charts for the next milestone.</p>
+    
+    <h2>IMPLEMENTATION</h2><hr>
+    <h3>MAP</h3>
+    <img alt="Milestone 1 Design" src="images/Map-Interaction.png" class="small" width="500">
+    <p>Colored markers indicate stations and their daily activity, while blue map backgrounds indicate local COVID-19 rates via saturation. The map is created with Leaflet.js to be mobile-responsive, and hovering over a station reveals more detailed information (name & usage details) within a popup. Furthermore, users can click stations to select them (which desaturates all unselected stations for contrast) and filter the data for other visualization components.</p>
+    <h3>TIME OVERLAY</h3>
+    <img alt="Milestone 1 Design" src="images/Time-Interaction.png" class="small" width="500">
+    <p>The user can see the current local time in NYC, and select options for manipulating the map visualization.</p>
+    <h3>LOCAL COVID-19 RISK</h3>
+    <img alt="Milestone 1 Design" src="images/COVID-Interaction.png" class="small" width="500">
+    <p>Users can quickly see whether areas of interest are COVID-19 hotspots, and compare their selected stations to the city-wide average as a reference point. Furthermore, to help make sense of these numbers, we provide a risk estimate for three different crowd sizes (5, 25, and 50 people) to show how quickly personal risk can grow in public settings.</p>
+    <h3>STATION USAGE</h3>
+    <img alt="Milestone 1 Design" src="images/Usage-Interaction.png" class="small" width="500">
+    <p>Users can see station activity over seven days to help make informed decisions about when to travel, and a year-to-date visualization shows a bigger picture view of usage during the pandemic. As we continue to present more data, this could reveal different waves of infection and lockdown. Although all of our raw data structures are in place, we have currently only cleaned a portion of it (~3.5 months’ worth), so these visualizations are not currently in sync with the Time Overlay clock. This will be accomplished for our next milestone.</p>
+
+    <h2>EVALUATION</h2><hr>
+    <p>Our visualization allows users to quickly view the status of metro transit and COVID-19 for NYC as a whole, and then refine the data to best match and inform their own personal travel plans. By Milestone 1, users can answer four of our five questions. To address our last remaining question (<em>Would it be safer if I traveled at a different time or day of the week?</em> ), we need to continue refining our station usage visualization by completing data cleaning and synchronizing the visualization to the current local NYC time.</p>
+    <p>To accomplish this, as well as add a few new useful improvements to our visualization, our next steps include:</p>
+    <ul>
+        <li>Once all data is cleaned, visualizing hourly traffic patterns, and synchronizing our visualization components to a time slider, which defaults to the current local EST time.</li>
+        <li>Adding a station recommendation component—if users select a busy station, we can provide alternative nearby stations with lower traffic or local COVID-19 rates.</li>
+        <li>Adding instructions, legends, and informative details to our visualization to make it accessible for all visitors and use cases.</li>
+    </ul>
+
+</body>
+</html>
