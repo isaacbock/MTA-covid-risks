@@ -137,6 +137,13 @@ YearToDateUsageChart.prototype.changeSelectedStations = function(stations){
 	this.updateVis();
 }
 
+YearToDateUsageChart.prototype.setEndDate = function(_endDate){
+	vis = this;
+	vis.endDate = new Date(_endDate);
+	vis.setScaleDomain();
+	vis.updateVis();
+}
+
 YearToDateUsageChart.prototype.setScaleDomain = function(){
 	vis = this;
 	vis.heightScale.domain([
