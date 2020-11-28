@@ -2,7 +2,7 @@
  *  StationMap - Object constructor function
  *  @param _parentElement   -- HTML element in which to draw the visualization
  *  @param _data            -- Array with all stations of the bike-sharing network
- *  @param endDate      -- String represents date of interest
+ *  @param endDate      	-- String represents date of interest
  */
 
 YearToDateUsageChart = function(_parentElement, _metroData, _endDate) {
