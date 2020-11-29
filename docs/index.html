@@ -47,6 +47,17 @@
 
 	<div id="detail-overlay">
 		<h2 id="current-stations">All Stations</h2>
+		<p id="station-suggestions"></p>
+		<div id="station-usage">
+			<h3><span id="station-usage-level"></span> Station Usage</h3>
+			<div>
+				<button>Daily Activity</button>
+				<button class="selected">Weekly Activity</button>
+			</div>
+			<div id="weekly-usage"></div>
+			<h3>Year-to-Date</h3>
+			<div id="year-to-date-usage"></div>
+		</div>
 		<div id="covid-risk">
 			<h3><span id="covid-risk-level"></span> Local COVID-19 Risk</h3>
 			<div id="covid-columns">
@@ -63,16 +74,6 @@
 					<p>We estimate a <span id="crowd-risk-estimate"></span> chance<br>of 1+ positive case.</p>
 				</div>
 			</div>
-		</div>
-		<div id="station-usage">
-			<h3>Station Usage</h3>
-			<div>
-				<!-- <button>Daily Activity</button> -->
-				<!-- <button class="selected">Weekly Activity</button> -->
-			</div>
-			<div id="weekly-usage"></div>
-			<h3>Year-to-Date</h3>
-			<div id="year-to-date-usage"></div>
 		</div>
 	</div>
 
@@ -92,6 +93,7 @@
 	<script src="js/covidRisk.js"></script>
 	<script src="js/weeklyUsageChart.js"></script>
 	<script src="js/yearToDateUsageChart.js"></script>
+	<script src="js/stationSuggestions.js"></script>
 	<!-- Load data, create visualizations -->
 	<script src="js/main.js"></script>
 </body>

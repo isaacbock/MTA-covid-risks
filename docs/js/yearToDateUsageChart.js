@@ -21,10 +21,10 @@ YearToDateUsageChart = function(_parentElement, _metroData, _endDate) {
 YearToDateUsageChart.prototype.initVis = function() {
     var vis = this;
 
-    vis.margin = { top: 40, right: 0, bottom: 40, left: 60 };
+    vis.margin = { top: 10, right: 0, bottom: 50, left: 60 };
 
 	vis.width = 400 - vis.margin.left - vis.margin.right,
-    vis.height = 150 - vis.margin.top - vis.margin.bottom;
+    vis.height = 125 - vis.margin.top - vis.margin.bottom;
 
   	// SVG drawing area
 	vis.svg = d3.select("#" + vis.parentElement).append("svg")
@@ -110,6 +110,7 @@ YearToDateUsageChart.prototype.updateVis = function() {
 	vis.path
 	.datum(vis.aggregatedDataArray)
 	.transition()
+	.duration(750)
 	.attr("d", vis.area);
 
 	//TODO draw axis and labels
@@ -123,7 +124,7 @@ YearToDateUsageChart.prototype.updateVis = function() {
 
 	vis.svg.append("g")
 	.attr("class", "axis x-axis")
-	.attr("transform", "translate(0, 70)")
+	.attr("transform", "translate(0, "+vis.height+")")
 	.call(vis.xAxis)
 
 	vis.svg.selectAll(".x-axis text")

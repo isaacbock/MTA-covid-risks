@@ -3,6 +3,8 @@ body {
     margin: auto;
     padding-top: 50px;
     padding-bottom: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
     font-family: 'Open Sans Condensed', sans-serif;
     background-color: #fefefe;
 }

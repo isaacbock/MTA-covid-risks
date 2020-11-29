@@ -39,7 +39,7 @@ WeeklyUsageChart.prototype.initVis = function() {
 	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
 	vis.xScale = d3.scaleTime().range([0, vis.width - vis.barWidth-20]);
 
-	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%a")).ticks(7);
+	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%a")).ticks(7).tickSize(0);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
 
 	vis.wrangleData();
@@ -112,9 +112,9 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	});
 
 	//update
-	selection.
-	transition()
-	.duration(200)
+	selection
+	.transition()
+	.duration(750)
 	.attr("y", d => {
 		return vis.heightScale(vis.usageDataOfInterest(d));
 	})
@@ -138,7 +138,7 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	.call(vis.xAxis)
 
 	vis.svg.selectAll(".x-axis text")
-	.attr("transform", "translate(15, 0)")
+	.attr("transform", "translate(15, 5)")
 }
 
 WeeklyUsageChart.prototype.changeSelectedStations = function(stations){

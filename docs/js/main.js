@@ -8,6 +8,8 @@ var timeSelector;
 var covidRisk;
 var weeklyUsageChart;
 var yearToDateUsageChart;
+var stationSuggestions;
+
 // Default options
 var showStations = true;
 var showLines = false;
@@ -18,7 +20,6 @@ loadData();
 
 function loadData() {
 
-	// USE PRE-AGGREGATED DATA AS A STARTING POINT WHILE WE WORK ON OUR OWN DATA PROCESSING via https://qri.cloud/nyc-transit-data/turnstile_daily_counts_2020
 	d3.csv("data/metro.csv").then( metroData => {
 		d3.csv("data/percent-positive.csv").then( covidData => {
 			self.metroData = metroData;
@@ -49,6 +50,7 @@ function createVis() {
 	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
 	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", allMetroData, "2020-11-13 EST");
 	covidRisk = new CovidRisk("covid-risk", "positivity-rates", covidData);
+	stationSuggestions = new StationSuggestions("station-suggestions", metroData);
 }
 
 function toggleLayers(stations, lines, covid) {
@@ -67,7 +69,7 @@ function selectStations(stations) {
 		stations.forEach(station => {
 			stationsString += station.name;
 			if (station!=stations[stations.length-1]) {
-				stationsString += ", <br>";
+				stationsString += ", ";
 			}
 		});
 	}
@@ -75,6 +77,7 @@ function selectStations(stations) {
 
 	// update other visualizations
 	covidRisk.wrangleData(stations);
+	stationSuggestions.wrangleData(stations);
 	weeklyUsageChart.changeSelectedStations(stations);
 	yearToDateUsageChart.changeSelectedStations(stations);
 }
