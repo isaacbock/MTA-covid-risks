@@ -1,5 +1,5 @@
 
-var metroData = [];
+var metroDataDaily = [];
 var covidData = [];
 
 // Variable for the visualization instance
@@ -20,21 +20,21 @@ loadData();
 
 function loadData() {
 
-	d3.csv("data/metro.csv").then( metroData => {
+	d3.json("data/metroDaily.json").then( metroDataDaily => {
 		d3.csv("data/percent-positive.csv").then( covidData => {
-			self.metroData = metroData;
+			self.metroDataDaily = metroDataDaily;
 			self.covidData = covidData;
 			
 			//all metro dates data for weekly usage chart, append timezone for correct date encoding / decoding
-			self.allMetroData = self.metroData.map( d => {
+			self.allmetroDataDaily = self.metroDataDaily.map( d => {
 				d.date = d.date + " EST";
 				return d;
 			});
 
 			// FOR NOW, ONLY USE THE MOST RECENT DATE (IN ORDER TO TEST AND SET UP THE MAIN MAP VISUALIZATION)
-			self.metroData = self.metroData.filter( record => record.date=="2020-10-14 EST");
+			self.metroDataDaily = self.metroDataDaily.filter( record => record.date=="2020-11-27 EST");
 			// Remove stations outside of NYC
-			self.metroData = self.metroData.filter( record => record.stop_name!="Newark Penn Station" && record.stop_name!="Harrison" && record.stop_name!="Journal Sq" && record.stop_name!="Grove St" && record.stop_name!="Pavonia/Newport" && record.stop_name!="Hoboken" && record.stop_name!="Exchange Pl");
+			self.metroDataDaily = self.metroDataDaily.filter( record => record.station!="Newark Penn Station" && record.stop_name!="Harrison" && record.stop_name!="Journal Sq" && record.stop_name!="Grove St" && record.stop_name!="Pavonia/Newport" && record.stop_name!="Hoboken" && record.stop_name!="Exchange Pl");
 			self.covidData = self.covidData[covidData.length-1];
 
 			createVis();
@@ -45,12 +45,12 @@ function loadData() {
 
 function createVis() {
 	// Instantiate visualization
-	stationMap = new StationMap("station-map", metroData, covidData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
-	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", allMetroData, "2020-10-14 EST");
+	stationMap = new StationMap("station-map", metroDataDaily, covidData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
+	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", allmetroDataDaily, "2020-10-14 EST");
 	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
-	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", allMetroData, "2020-11-13 EST");
+	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", allmetroDataDaily, "2020-11-27 EST");
 	covidRisk = new CovidRisk("covid-risk", "positivity-rates", covidData);
-	stationSuggestions = new StationSuggestions("station-suggestions", metroData);
+	stationSuggestions = new StationSuggestions("station-suggestions", metroDataDaily);
 }
 
 function toggleLayers(stations, lines, covid) {

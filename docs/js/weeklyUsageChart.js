@@ -70,12 +70,12 @@ WeeklyUsageChart.prototype.wrangleData = function() {
 	const aggregatedData = {};
 	vis.filteredData.forEach(element => {
 		const totalSofar = aggregatedData[element.date]?.total ? aggregatedData[element.date]?.total : 0;
-		const stationVisitors = parseInt(element.entries) + parseInt(element.exits);
+		const stationVisitors = element.tot;
 		aggregatedData[element.date] = {
 			...aggregatedData[element.date],
 			date: new Date(element.date),
 			total: totalSofar + stationVisitors,
-			[element.stop_name]: stationVisitors,
+			[element.name]: stationVisitors,
 		}
 	});
 	
@@ -84,7 +84,7 @@ WeeklyUsageChart.prototype.wrangleData = function() {
 	Object.keys(aggregatedData).forEach(k => {
 		vis.aggregatedDataArray.push(aggregatedData[k]);
 	})
-	console.log(vis.aggregatedDataArray);
+	// console.log(vis.aggregatedDataArray);
 	// Set scale domain based on filtered data and station
 	vis.setScaleDomain();
 
@@ -143,7 +143,7 @@ WeeklyUsageChart.prototype.updateVis = function() {
 
 WeeklyUsageChart.prototype.changeSelectedStations = function(stations){
 	this.selectedStations = stations;
-	console.log(stations);
+	// console.log(stations);
 	this.setScaleDomain();
 	this.updateVis();
 }
@@ -162,7 +162,7 @@ WeeklyUsageChart.prototype.setScaleDomain = function(){
 		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
 	])
 
-	console.log(vis.heightScale.domain());
+	// console.log(vis.heightScale.domain());
 
 	vis.xScale.domain([vis.startDate, vis.endDate])
 

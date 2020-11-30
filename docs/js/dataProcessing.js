@@ -73,7 +73,7 @@ function updateData() {
         // clean original raw data and add in station latitude and longitudes
         data.forEach(reading => {
             let date = reading.DATE + " " + reading.TIME
-            reading.observedAt = moment.tz(date,"MM/DD/YY HH:mm:ss", "America/New_York");
+            reading.observedAt = moment.tz(date,"MM/DD/YYYY HH:mm:ss", "America/New_York");
             reading.id = reading.UNIT + reading["C/A"] + reading.SCP + reading.observedAt;
             reading.unitID = reading.UNIT + reading["C/A"] + reading.SCP;
             
@@ -128,13 +128,15 @@ function updateData() {
         for (let i=1; i<consolidatedData.length; i++) {
             let previous = consolidatedData[i-1];
             let current = consolidatedData[i];
-            if (current.readingID!=previous.readingID && current.complex==previous.complex && current.unitID==previous.unitID && current.date.year() >= 2020) {
+            let entries = (current.entries-previous.entries > 0) ? current.entries-previous.entries : 0;
+            let exits = (current.exits-previous.exits > 0) ? current.exits-previous.exits : 0;
+            if (current.readingID!=previous.readingID && current.complex==previous.complex && current.unitID==previous.unitID && current.date.year() >= 2020 && entries<10000 && exits<10000) {
                 aggregateTurnstileData.push({
                     station: current.station,
                     complex: current.complex,
                     date: current.date,
-                    entries: (current.entries-previous.entries > 0) ? current.entries-previous.entries : 0,
-                    exits: (current.exits-previous.exits > 0) ? current.exits-previous.exits : 0,
+                    entries: entries,
+                    exits: exits,
                     latitude: current.latitude,
                     longitude: current.longitude
                 })
@@ -228,7 +230,7 @@ function updateData() {
         // clean original raw data and add in station latitude and longitudes
         data.forEach(reading => {
             let date = reading.DATE + " " + reading.TIME
-            reading.observedAt = moment.tz(date,"MM/DD/YY HH:mm:ss", "America/New_York");
+            reading.observedAt = moment.tz(date,"MM/DD/YYYY HH:mm:ss", "America/New_York");
             reading.id = reading.UNIT + reading["C/A"] + reading.SCP + reading.observedAt;
             reading.unitID = reading.UNIT + reading["C/A"] + reading.SCP;
             
@@ -283,13 +285,15 @@ function updateData() {
         for (let i=1; i<consolidatedData.length; i++) {
             let previous = consolidatedData[i-1];
             let current = consolidatedData[i];
-            if (current.readingID!=previous.readingID && current.complex==previous.complex && current.unitID==previous.unitID && current.date.year() >= 2020) {
+            let entries = (current.entries-previous.entries > 0) ? current.entries-previous.entries : 0;
+            let exits = (current.exits-previous.exits > 0) ? current.exits-previous.exits : 0;
+            if (current.readingID!=previous.readingID && current.complex==previous.complex && current.unitID==previous.unitID && current.date.year() >= 2020 && entries<10000 && exits<10000) {
                 aggregateTurnstileData.push({
                     station: current.station,
                     complex: current.complex,
                     date: current.date,
-                    entries: (current.entries-previous.entries > 0) ? current.entries-previous.entries : 0,
-                    exits: (current.exits-previous.exits > 0) ? current.exits-previous.exits : 0,
+                    entries: entries,
+                    exits: exits,
                     latitude: current.latitude,
                     longitude: current.longitude
                 })

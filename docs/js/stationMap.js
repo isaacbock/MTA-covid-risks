@@ -90,14 +90,12 @@ StationMap.prototype.updateVis = function() {
 
 	vis.metroData.forEach(station => {
 		// Popup content
-		let popupContent = "<strong>"+ station.stop_name +"</strong><br/>";
-		popupContent += station.entries + " entries";
-		popupContent += "<br>";
-		popupContent += station.exits + " exits";
+		let popupContent = "<strong>"+ station.name + "</strong><br/>";
+		popupContent += station.tot + " visitors today";
 
 		// Create custom icon (via https://www.geoapify.com/create-custom-map-marker-icon) based on number of passengers at each station
 		// Currently <5k is low activity, <10k is medium activity, and >=10k is high activity
-		let totalVisitors = parseInt(station.entries) + parseInt(station.exits);
+		let totalVisitors = station.tot;
 		let icon;
 		if (totalVisitors < 5000) {
 			icon = L.divIcon({
@@ -122,13 +120,13 @@ StationMap.prototype.updateVis = function() {
 		}
 		
 		// Plot markers
-		let marker = L.marker([station.gtfs_latitude, station.gtfs_longitude], { icon: icon, pane: 'stations'})
+		let marker = L.marker([station.lat, station.long], { icon: icon, pane: 'stations'})
 			// .bindPopup(popupContent)
 			.bindTooltip(popupContent)
 			.addTo(vis.map);
-		marker.name = station.stop_name;
-		marker.latitude = station.gtfs_latitude;
-		marker.longitude = station.gtfs_longitude;
+		marker.name = station.name;
+		marker.latitude = station.lat;
+		marker.longitude = station.long;
 		marker.selected = false;
 		marker.on('click', onStationClick);
 		vis.allStations.push(marker);

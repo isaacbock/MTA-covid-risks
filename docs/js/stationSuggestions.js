@@ -54,18 +54,18 @@ StationSuggestions.prototype.wrangleData = function(_selectedStations) {
         // find nearby stations
         vis.metroData.forEach(station => {
             vis.selectedStations.forEach(selectedStation => {
-                var from = turf.point([station.gtfs_longitude, station.gtfs_latitude]);
+                var from = turf.point([station.long, station.lat]);
                 var to = turf.point([selectedStation.longitude, selectedStation.latitude]);
                 var options = {units: 'miles'};
 
                 var distance = turf.distance(from, to, options);
-                if (distance < maxDistanceMiles && !vis.selectedStations.some(d => d.name==station.stop_name)) {
+                if (distance < maxDistanceMiles && !vis.selectedStations.some(d => d.name==station.name)) {
                     // if new nearby station, add to nearby station array
-                    if (!vis.nearbyStations.some(d => d.station==station.stop_name)) {
+                    if (!vis.nearbyStations.some(d => d.station==station.name)) {
                         vis.nearbyStations.push({
-                            station: station.stop_name, 
-                            latitude: station.gtfs_latitude, 
-                            longitude: station.gtfs_longitude, 
+                            station: station.name, 
+                            latitude: station.lat, 
+                            longitude: station.long, 
                             distance: distance,
                             originalStation: selectedStation.name,
                             originalLatitude: selectedStation.latitude,
@@ -74,11 +74,11 @@ StationSuggestions.prototype.wrangleData = function(_selectedStations) {
                     }
                     // else, station already exists: do not create new nearby station, and instead only update its data if this instance is closer
                     else {
-                        let existingNearbyStation = vis.nearbyStations.find(d => d.station==station.stop_name);
+                        let existingNearbyStation = vis.nearbyStations.find(d => d.station==station.name);
                         if (distance < existingNearbyStation.distance) {
                             existingNearbyStation.distance = distance;
-                            existingNearbyStation.latitude = station.gtfs_latitude;
-                            existingNearbyStation.longitude = station.gtfs_longitude;
+                            existingNearbyStation.latitude = station.lat;
+                            existingNearbyStation.longitude = station.long;
                         }
                     }
                 }
@@ -107,13 +107,13 @@ StationSuggestions.prototype.wrangleData = function(_selectedStations) {
         // get metro rate of each selected station and nearby stations
         vis.metroData.forEach(station => {
             vis.selectedStations.forEach(selectedStation => {
-                if (station.stop_name==selectedStation.name && station.gtfs_latitude==selectedStation.latitude && station.gtfs_longitude==selectedStation.longitude) {
-                    selectedStation.trafficCount = parseInt(station.entries) + parseInt(station.exits);
+                if (station.name==selectedStation.name && station.lat==selectedStation.latitude && station.long==selectedStation.longitude) {
+                    selectedStation.trafficCount = station.tot;
                 }
             });
             vis.nearbyStations.forEach(nearbyStation => {
-                if (station.stop_name==nearbyStation.station && station.gtfs_latitude==nearbyStation.latitude && station.gtfs_longitude==nearbyStation.longitude) {
-                    nearbyStation.trafficCount = parseInt(station.entries) + parseInt(station.exits);
+                if (station.name==nearbyStation.station && station.lat==nearbyStation.latitude && station.long==nearbyStation.longitude) {
+                    nearbyStation.trafficCount = station.tot;
                 }
             });
         });
