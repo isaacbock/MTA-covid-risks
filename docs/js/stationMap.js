@@ -143,23 +143,6 @@ StationMap.prototype.updateVis = function() {
 				station.selected = false;
 				vis.selectedStations = vis.selectedStations.filter(d => d.latitude!==station.latitude && d.longitude!==station.longitude);
 			}
-			// if some stations are selected, the rest should be somewhat desaturated for contrast
-			if (vis.selectedStations.length!=0) {
-				vis.allStations.forEach(station => {
-					if (vis.selectedStations.some(d => d.name===station.name && d.latitude===station.latitude && d.longitude===station.longitude)) {
-						$(station._icon).removeClass("unselected");
-					}
-					else {
-						$(station._icon).addClass("unselected");
-					}
-				});
-			}
-			// else if no stations are selected, all should be displayed in full color
-			else {
-				vis.allStations.forEach(station => {
-					$(station._icon).removeClass("unselected");
-				});
-			}
 			selectStations(vis.selectedStations);
 		}
 	});
@@ -286,5 +269,32 @@ StationMap.prototype.toggleLayers = function(_showStations, _showLines, _showCOV
 	}
 	else {
 		vis.map.getPane('COVID').style.display = "none";
+	}
+}
+
+/*
+ *  Select stations
+ *  @param _stations  -- Stations to select
+ */
+
+StationMap.prototype.selectStations = function(_stations) {
+	var vis = this;
+	vis.selectedStations = _stations;
+	// if some stations are selected, the rest should be somewhat desaturated for contrast
+	if (vis.selectedStations.length!=0) {
+		vis.allStations.forEach(station => {
+			if (vis.selectedStations.some(d => d.name===station.name && d.latitude===station.latitude && d.longitude===station.longitude)) {
+				$(station._icon).removeClass("unselected");
+			}
+			else {
+				$(station._icon).addClass("unselected");
+			}
+		});
+	}
+	// else if no stations are selected, all should be displayed in full color
+	else {
+		vis.allStations.forEach(station => {
+			$(station._icon).removeClass("unselected");
+		});
 	}
 }

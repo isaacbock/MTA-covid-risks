@@ -28,6 +28,16 @@
 	<div id="time-overlay">
 		<h1 id="current-date"></h1>
 		<h2 id="current-time"></h2>
+		<form>
+			<input type="range" id="time-slider" name="vol" min="0" max="41" step="1">
+		</form>
+		<div id="weekday-labels">
+			<p>S</p><p>M</p><p>T</p><p>W</p><p>Th</p><p>F</p><p>S</p>
+		</div>
+		<div id="reset-buttons">
+			<button id="now-button">Now</button>
+			<button id="clear-button">Clear Stations</button>
+		</div>
 		<div>
 			<input type="checkbox" id="show-stations" name="Metro Stations">
 			<label for="show-stations">Metro Stations</label>

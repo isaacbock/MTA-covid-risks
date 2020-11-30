@@ -62,6 +62,15 @@ function toggleLayers(stations, lines, covid) {
 
 function selectStations(stations) {
 
+	if (stations==undefined || stations.length==0) {
+		$("#clear-button").removeClass("active");
+	}
+	else {
+		$("#clear-button").addClass("active").click(function() {
+			selectStations([]);
+		});
+	}
+
 	// update text label
 	let stationsString = "All Stations";
 	if (stations.length>0) {
@@ -76,6 +85,7 @@ function selectStations(stations) {
 	$("#current-stations").html(stationsString);
 
 	// update other visualizations
+	stationMap.selectStations(stations);
 	covidRisk.wrangleData(stations);
 	stationSuggestions.wrangleData(stations);
 	weeklyUsageChart.changeSelectedStations(stations);
