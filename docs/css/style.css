@@ -145,7 +145,7 @@ button:focus {
 	justify-content: start;
 	overflow: scroll;
 	-ms-overflow-style: none;
-  	scrollbar-width: none;
+	scrollbar-width: none;
 }
 #detail-overlay > h2 {
 	padding-left: 10px;
