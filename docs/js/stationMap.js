@@ -34,6 +34,7 @@ StationMap.prototype.initVis = function() {
 	vis.allStations = [];
 	vis.selectedStations = [];
 	
+	$("#station-map").html("");
 	vis.map = L.map(vis.parentElement, {zoomControl: false}).setView(vis.mapPosition, 11);
 	L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}', {
 		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -297,4 +298,21 @@ StationMap.prototype.selectStations = function(_stations) {
 			$(station._icon).removeClass("unselected");
 		});
 	}
+}
+
+/*
+ *  Update data w/ refresh
+ *  @param _stations  -- Stations to select
+ */
+
+StationMap.prototype.refresh = function(_parentElement, _metroData, _covidData, _mapPosition, _defaultOptions) {
+
+	this.parentElement = _parentElement;
+	this.metroData = _metroData;
+	this.covidData = _covidData;
+	this.mapPosition = _mapPosition;
+	this.showStations = _defaultOptions[0];
+	this.showLines = _defaultOptions[1];
+	this.showCOVID = _defaultOptions[2];
+	this.wrangleData();
 }

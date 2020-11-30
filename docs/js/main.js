@@ -15,6 +15,11 @@ var showStations = true;
 var showLines = false;
 var showCOVID = true;
 
+// Hide visualizations until loaded
+$("#time-overlay").hide();
+$("#detail-overlay").hide();
+// Begin displaying map even while data is still loading
+stationMap = new StationMap("station-map", [], [], [40.7350, -73.7800], [showStations, showLines, showCOVID]);
 // Start application by loading the data
 loadData();
 
@@ -45,12 +50,19 @@ function loadData() {
 
 function createVis() {
 	// Instantiate visualization
-	stationMap = new StationMap("station-map", metroDataDaily, covidData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
+	stationMap.refresh("station-map", metroDataDaily, covidData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
 	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", allmetroDataDaily, "2020-10-14 EST");
 	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
 	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", allmetroDataDaily, "2020-11-27 EST");
 	covidRisk = new CovidRisk("covid-risk", "positivity-rates", covidData);
 	stationSuggestions = new StationSuggestions("station-suggestions", metroDataDaily);
+
+	// Show visualization
+	$("#time-overlay").fadeIn(1000);
+	$("#detail-overlay").fadeIn(1000);
+	$("#start-button").addClass("active").text("BEGIN").click(function() {
+		$("#loading-screen").fadeOut(250);
+	});
 }
 
 function toggleLayers(stations, lines, covid) {
