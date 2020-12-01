@@ -53,7 +53,7 @@ TimeSelector.prototype.initVis = function() {
     }); 
 
     function updateTimeEachSecond(){
-        vis.updateVis();
+        vis.updateVis("scheduled");
         setTimeout(updateTimeEachSecond, 1000);
     }
     updateTimeEachSecond();
@@ -96,7 +96,7 @@ TimeSelector.prototype.wrangleData = function() {
  *  The drawing function
  */
 
-TimeSelector.prototype.updateVis = function() {
+TimeSelector.prototype.updateVis = function(options) {
     var vis = this;
 
     if (vis.displayingCurrentTime) {
@@ -115,6 +115,11 @@ TimeSelector.prototype.updateVis = function() {
         else if (vis.time.hour() < 24)   { sliderPosition += 5 }
         vis.slider.value = sliderPosition;
         vis.sliderPosition = sliderPosition;
+        let day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
+        let hour = vis.sliderPosition%6;
+        if (options!="scheduled") {
+            changeCurrentTime(day, hour);
+        }
     }
     else {
         let day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
@@ -122,6 +127,9 @@ TimeSelector.prototype.updateVis = function() {
         vis.nowButton.addClass("active");
         vis.currentDate.text(vis.daysOfWeek[day]);
         vis.currentTime.text(vis.hourBins[hour]);
+        if (options!="scheduled") {
+            changeCurrentTime(day, hour);
+        }
     }
 
 }

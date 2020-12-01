@@ -21,7 +21,7 @@ YearToDateUsageChart = function(_parentElement, _metroData, _endDate) {
 YearToDateUsageChart.prototype.initVis = function() {
     var vis = this;
 
-    vis.margin = { top: 10, right: 0, bottom: 50, left: 60 };
+    vis.margin = { top: 10, right: 0, bottom: 40, left: 60 };
 
 	vis.width = 400 - vis.margin.left - vis.margin.right,
     vis.height = 125 - vis.margin.top - vis.margin.bottom;
@@ -110,7 +110,6 @@ YearToDateUsageChart.prototype.updateVis = function() {
 	vis.path
 	.datum(vis.aggregatedDataArray)
 	.transition()
-	.duration(750)
 	.attr("d", vis.area);
 
 	//TODO draw axis and labels

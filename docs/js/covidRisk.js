@@ -1,16 +1,18 @@
 
 /*
  *  CovidRisk - Object constructor function
- *  @param _parentElement   -- HTML element in which to draw the broad visualization
- *  @param _svgElement      -- HTML element in which to draw the SVG visualization
- *  @param _covidData  		-- Array with all zip code COVID-19 rates
+ *  @param _parentElement       -- HTML element in which to draw the broad visualization
+ *  @param _svgElement          -- HTML element in which to draw the SVG visualization
+ *  @param _covidData  		    -- Array with all zip code COVID-19 rates
+ *  @param _neightborhoodData  	-- Neighborhood geoJSON features
  */
 
-CovidRisk = function(_parentElement, _svgElement, _covidData) {
+CovidRisk = function(_parentElement, _svgElement, _covidData, _neighborhoodData) {
 
     this.parentElement = _parentElement;
     this.svgElement = _svgElement;
     this.covidData = _covidData;
+    this.neighborhoodData = _neighborhoodData;
 
 	this.initVis();
 }
@@ -72,11 +74,8 @@ CovidRisk.prototype.initVis = function() {
     // By default, no cities are selected
     vis.selectedCities = [];
 
-    // Get zip code geographic info
-    $.getJSON("data/modzcta.geo.json", function(neighborhoodData) {
-        vis.modZCTA = neighborhoodData;
-        vis.wrangleData();
-    });
+    vis.wrangleData();
+    
 }
 
 
@@ -107,7 +106,7 @@ CovidRisk.prototype.wrangleData = function(_selectedStations) {
         stations.forEach(station => {
             stationLocations.push([station.longitude, station.latitude]);
         });
-        vis.modZCTA.features.forEach(region => {
+        vis.neighborhoodData.features.forEach(region => {
             stationLocations.forEach(location => {
                 if (turf.booleanPointInPolygon(location, region)) {
                     let zipCode = region.properties.MODZCTA;

@@ -3,16 +3,22 @@
  *  StationMap - Object constructor function
  *  @param _parentElement   -- HTML element in which to draw the visualization
  *  @param _metroData		-- Array with all metro stations of the MTA
+ *  @param _daysOfWeek		-- Most recent seven days and their corresponding days of the week (as ints)
  *  @param _covidData  		-- Array with all zip code COVID-19 rates
+ *  @param _neightborhoodData  	-- Neighborhood geoJSON features
+ *  @param _lineData  		-- Line geoJSON features
  *  @param _mapPosition   	-- Geographic center of NYC
  * 	@param _defaultOptions  -- Array of default display options
  */
 
-StationMap = function(_parentElement, _metroData, _covidData, _mapPosition, _defaultOptions) {
+StationMap = function(_parentElement, _metroData, _daysOfWeek, _covidData, _neighborhoodData, _lineData, _mapPosition, _defaultOptions) {
 
 	this.parentElement = _parentElement;
 	this.metroData = _metroData;
+	this.daysOfWeek = _daysOfWeek
 	this.covidData = _covidData;
+	this.neighborhoodData = _neighborhoodData
+	this.subwayLines = _lineData;
 	this.mapPosition = _mapPosition;
 	this.showStations = _defaultOptions[0];
 	this.showLines = _defaultOptions[1];
@@ -33,6 +39,9 @@ StationMap.prototype.initVis = function() {
 
 	vis.allStations = [];
 	vis.selectedStations = [];
+	vis.currentHourStrings = ["tot_12am", "tot_4am", "tot_8am", "tot_12pm", "tot_4pm", "tot_8pm"];
+	vis.currentHourStringsFull = ["12am - 4am", "4am - 8am", "8am - 12pm", "12pm - 4pm", "4pm - 8pm", "8pm - 12am"];
+	vis.weekdaysFull = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
 	
 	$("#station-map").html("");
 	vis.map = L.map(vis.parentElement, {zoomControl: false}).setView(vis.mapPosition, 11);
@@ -53,16 +62,8 @@ StationMap.prototype.initVis = function() {
 	L.control.zoom({
 		position: 'bottomleft'
 	}).addTo(vis.map);
-
-	// MTA Subway Line Data via https://data.cityofnewyork.us/Transportation/Subway-Lines/3qz8-muuu
-	$.getJSON("data/SubwayLines.geo.json", function(lineData) {
-		// NYC Zip Codes via XXXXX
-		$.getJSON("data/modzcta.geo.json", function(neighborhoodData) {
-			vis.subwayLines = lineData;
-			vis.modZCTA = neighborhoodData;
-			vis.wrangleData();
-		});
-	});
+			
+	vis.wrangleData();
 }
 
 
@@ -70,42 +71,45 @@ StationMap.prototype.initVis = function() {
  *  Data wrangling
  */
 
-StationMap.prototype.wrangleData = function() {
+StationMap.prototype.wrangleData = function(currentDay, currentHour, options) {
 	var vis = this;
 
+	vis.currentDay = (currentDay!=undefined) ? currentDay : 0;
+	vis.currentHour = (currentHour!=undefined) ? currentHour : 0;
+
+	let currentDate = vis.daysOfWeek.find(d => d.dayOfWeek==vis.currentDay);
+
 	// Currently no data wrangling/filtering needed
-	// vis.displayData = vis.data;
+	vis.displayData = vis.metroData.filter(d => d.date==currentDate.date);
 
-	// Update the visualization
 	vis.updateVis();
-
+	if (options=="create") {
+		vis.createVis();
+	}
+	
 }
-
 
 /*
  *  The drawing function
  */
 
-StationMap.prototype.updateVis = function() {
+StationMap.prototype.createVis = function() {
 	var vis = this;
 
-	vis.metroData.forEach(station => {
-		// Popup content
-		let popupContent = "<strong>"+ station.name + "</strong><br/>";
-		popupContent += station.tot + " visitors today";
-
+	vis.displayData.forEach(station => {
+	
 		// Create custom icon (via https://www.geoapify.com/create-custom-map-marker-icon) based on number of passengers at each station
 		// Currently <5k is low activity, <10k is medium activity, and >=10k is high activity
-		let totalVisitors = station.tot;
+		let totalVisitors = station[vis.currentHourStrings[vis.currentHour]];
 		let icon;
-		if (totalVisitors < 5000) {
+		if (totalVisitors < 500) {
 			icon = L.divIcon({
 				className: "station-marker low",
 				iconSize: [10, 10],
 				iconAnchor: [5, 5]
 			});
 		}
-		else if (totalVisitors < 10000) {
+		else if (totalVisitors < 1000) {
 			icon = L.divIcon({
 				className: "station-marker medium",
 				iconSize: [10, 10],
@@ -119,6 +123,10 @@ StationMap.prototype.updateVis = function() {
 				iconAnchor: [5, 5]
 			});
 		}
+
+		// Popup content
+		let popupContent = "<strong>"+ station.name + "</strong><br/>";
+		popupContent += totalVisitors + " visitors between <br>" + vis.currentHourStringsFull[vis.currentHour] + " on " + vis.weekdaysFull[vis.currentDay];
 		
 		// Plot markers
 		let marker = L.marker([station.lat, station.long], { icon: icon, pane: 'stations'})
@@ -128,6 +136,7 @@ StationMap.prototype.updateVis = function() {
 		marker.name = station.name;
 		marker.latitude = station.lat;
 		marker.longitude = station.long;
+		marker.id = station.id;
 		marker.selected = false;
 		marker.on('click', onStationClick);
 		vis.allStations.push(marker);
@@ -166,7 +175,7 @@ StationMap.prototype.updateVis = function() {
 	});
 
 	// Add zip code overlays
-	L.geoJson(vis.modZCTA, {
+	L.geoJson(vis.neighborhoodData, {
 		style: styleZipCode,
 		weight: 0,
 		pane: "COVID"
@@ -243,6 +252,57 @@ StationMap.prototype.updateVis = function() {
 
 }
 
+
+/*
+ *  The drawing function
+ */
+
+StationMap.prototype.updateVis = function() {
+	var vis = this;
+
+	if (vis.allStations.length != 0) {
+		vis.displayData.forEach(station => {
+
+			let marker = vis.allStations.find(d => d.id==station.id);
+			// console.log(marker)
+			
+			let totalVisitors = station[vis.currentHourStrings[vis.currentHour]];
+			if (totalVisitors < 500) {
+				icon = L.divIcon({
+					className: "station-marker low",
+					iconSize: [10, 10],
+					iconAnchor: [5, 5]
+				});
+				marker.setIcon(icon);
+			}
+			else if (totalVisitors < 1000) {
+				icon = L.divIcon({
+					className: "station-marker medium",
+					iconSize: [10, 10],
+					iconAnchor: [5, 5]
+				});
+				marker.setIcon(icon);
+			}
+			else {
+				icon = L.divIcon({
+					className: "station-marker high",
+					iconSize: [10, 10],
+					iconAnchor: [5, 5]
+				});
+				marker.setIcon(icon);
+			}
+
+			// Popup content
+			let popupContent = "<strong>"+ station.name + "</strong><br/>";
+			popupContent += totalVisitors + " visitors between <br>" + vis.currentHourStringsFull[vis.currentHour] + " on " + vis.weekdaysFull[vis.currentDay];
+			marker.setTooltipContent(popupContent);
+			
+
+		});
+	
+	}
+}
+
 /*
  *  Toggle layers
  *  @param _showStations  	-- Boolean to show or hide MTA stations
@@ -302,17 +362,27 @@ StationMap.prototype.selectStations = function(_stations) {
 
 /*
  *  Update data w/ refresh
- *  @param _stations  -- Stations to select
+ *  @param _parentElement   -- HTML element in which to draw the visualization
+ *  @param _metroData		-- Array with all metro stations of the MTA
+ *  @param _daysOfWeek		-- Most recent seven days and their corresponding days of the week
+ *  @param _covidData  		-- Array with all zip code COVID-19 rates
+ *  @param _neightborhoodData  	-- Neighborhood geoJSON features
+ *  @param _lineData  		-- Line geoJSON features
+ *  @param _mapPosition   	-- Geographic center of NYC
+ * 	@param _defaultOptions  -- Array of default display options
  */
 
-StationMap.prototype.refresh = function(_parentElement, _metroData, _covidData, _mapPosition, _defaultOptions) {
-
+StationMap.prototype.refresh = function(_parentElement, _metroData, _daysOfWeek, _covidData, _neighborhoodData, _lineData, _mapPosition, _defaultOptions) {
 	this.parentElement = _parentElement;
 	this.metroData = _metroData;
+	this.daysOfWeek = _daysOfWeek;
 	this.covidData = _covidData;
+	this.neighborhoodData = _neighborhoodData;
+	this.subwayLines = _lineData;
 	this.mapPosition = _mapPosition;
 	this.showStations = _defaultOptions[0];
 	this.showLines = _defaultOptions[1];
 	this.showCOVID = _defaultOptions[2];
-	this.wrangleData();
+
+	this.wrangleData(0,0,"create");
 }

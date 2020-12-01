@@ -9,7 +9,6 @@ StationSuggestions = function(_parentElement, _metroData) {
 
     this.parentElement = _parentElement;
     this.metroData = _metroData;
-    // this.covidData = _covidData;
 
 	this.initVis();
 }
@@ -24,11 +23,6 @@ StationSuggestions.prototype.initVis = function() {
 
     // By default, no stations are selected
     vis.selectedStations = [];
-
-    // $.getJSON("data/modzcta.geo.json", function(neighborhoodData) {
-    //     vis.modZCTA = neighborhoodData;
-    //     vis.wrangleData();
-    // });
 
 }
 
@@ -84,25 +78,6 @@ StationSuggestions.prototype.wrangleData = function(_selectedStations) {
                 }
             });
         });
-        
-        // get covid rate of each selected station and nearby station:
-
-        // vis.modZCTA.features.forEach(region => {
-        //     vis.selectedStations.forEach(station => {
-        //         if (turf.booleanPointInPolygon([station.longitude, station.latitude], region)) {
-        //             let zipCode = region.properties.MODZCTA;
-        //             let lookupKey = "PCTPOS_" + zipCode;
-        //             station.covidRate = parseFloat(vis.covidData[lookupKey]);
-        //         }
-        //     });
-        //     vis.nearbyStations.forEach(station => {
-        //         if (turf.booleanPointInPolygon([station.longitude, station.latitude], region)) {
-        //             let zipCode = region.properties.MODZCTA;
-        //             let lookupKey = "PCTPOS_" + zipCode;
-        //             station.covidRate = parseFloat(vis.covidData[lookupKey]);
-        //         }
-        //     });
-        // });
        
         // get metro rate of each selected station and nearby stations
         vis.metroData.forEach(station => {
