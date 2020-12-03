@@ -146,7 +146,7 @@ StationMap.prototype.createVis = function() {
 			// select station
 			if (!station.selected) {
 				station.selected = true;
-				vis.selectedStations.push({name: station.name, latitude: station.latitude, longitude: station.longitude});
+				vis.selectedStations.push({name: station.name, latitude: station.latitude, longitude: station.longitude, id: station.id});
 			}
 			// else deselect station
 			else {
@@ -299,6 +299,8 @@ StationMap.prototype.updateVis = function() {
 			
 
 		});
+
+		vis.selectStations(vis.selectedStations);
 	
 	}
 }

@@ -6,6 +6,7 @@ var covidData = [];
 var stationMap;
 var timeSelector;
 var covidRisk;
+var dailyUsageChart;
 var weeklyUsageChart;
 var yearToDateUsageChart;
 var stationSuggestions;
@@ -18,8 +19,25 @@ var showCOVID = true;
 // Hide visualizations until loaded
 $("#time-overlay").hide();
 $("#detail-overlay").hide();
+
 // Begin displaying map even while data is still loading
 stationMap = new StationMap("station-map", [], [], [], [], [], [40.7350, -73.7800], [showStations, showLines, showCOVID]);
+
+// Only show daily usage map, hide hourly usage map unti user clicks toggle buttons
+$("#weekly-usage").hide();
+
+$("#weekly-button").click(function () {
+	$("#daily-usage").hide();
+	$("#weekly-usage").show();
+	$("#weekly-button").addClass("selected")
+	$("#daily-button").removeClass("selected");
+});
+$("#daily-button").click(function () {
+	$("#weekly-usage").hide();
+	$("#daily-usage").show();
+	$("#daily-button").addClass("selected")
+	$("#weekly-button").removeClass("selected");
+});
 
 // Load data asynchronously
 var files = ["data/metroDaily.json", "data/metroHourly.json", "data/percent-positive.csv", "data/modzcta.geo.json", "data/SubwayLines.geo.json"];
@@ -71,6 +89,7 @@ function processData(metroDataDaily, metroDataHourly, covidData, neighborhoodDat
 function createVis() {
 	// Instantiate visualization
 	stationMap.refresh("station-map", metroDataHourly, daysOfWeek, covidData, neighborhoodData, lineData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
+	dailyUsageChart = new DailyUsageChart("daily-usage", metroDataHourly);
 	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", metroDataDaily, "2020-10-14 EST");
 	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
 	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", metroDataDaily, "2020-11-27 EST");
@@ -120,10 +139,13 @@ function selectStations(stations) {
 	stationMap.selectStations(stations);
 	covidRisk.wrangleData(stations);
 	stationSuggestions.wrangleData(stations);
+	dailyUsageChart.changeSelectedStations(stations);
 	weeklyUsageChart.changeSelectedStations(stations);
 	yearToDateUsageChart.changeSelectedStations(stations);
 }
 
 function changeCurrentTime(day, hour) {
 	stationMap.wrangleData(day, hour);
+	dailyUsageChart.wrangleData(day, hour);
+	weeklyUsageChart.updateVis(day);
 }

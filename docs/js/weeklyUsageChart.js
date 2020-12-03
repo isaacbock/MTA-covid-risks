@@ -20,12 +20,16 @@ WeeklyUsageChart = function(_parentElement, _metroData, _endDate) {
 }
 
 WeeklyUsageChart.prototype.initVis = function() {
+
     var vis = this;
 
     vis.margin = { top: 40, right: 0, bottom: 40, left: 60 };
 
 	vis.width = 400 - vis.margin.left - vis.margin.right,
-    vis.height = 150 - vis.margin.top - vis.margin.bottom;
+	vis.height = 150 - vis.margin.top - vis.margin.bottom;
+	
+	vis.daysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
+	vis.currentDay = 0;
 
 	vis.barWidth = 30;
   	// SVG drawing area
@@ -37,9 +41,9 @@ WeeklyUsageChart.prototype.initVis = function() {
 	
 	// Initialize Scales and Axex
 	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
-	vis.xScale = d3.scaleTime().range([0, vis.width - vis.barWidth-20]);
+	vis.xScale = d3.scaleLinear().range([0, vis.width]);
 
-	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%a")).ticks(7).tickSize(0);
+	vis.xAxis = d3.axisBottom().tickFormat(d => vis.daysOfWeek[d]).ticks(7).tickSize(0);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
 
 	vis.wrangleData();
@@ -84,6 +88,10 @@ WeeklyUsageChart.prototype.wrangleData = function() {
 	Object.keys(aggregatedData).forEach(k => {
 		vis.aggregatedDataArray.push(aggregatedData[k]);
 	})
+	vis.aggregatedDataArray.sort(function (a, b) {
+		if (a.date.getDay() > b.date.getDay()) return 1;
+		else return -1;
+	});
 	// console.log(vis.aggregatedDataArray);
 	// Set scale domain based on filtered data and station
 	vis.setScaleDomain();
@@ -93,19 +101,31 @@ WeeklyUsageChart.prototype.wrangleData = function() {
 
 }
 
-WeeklyUsageChart.prototype.updateVis = function() {
+WeeklyUsageChart.prototype.updateVis = function(currentDayOfWeek) {
 	vis = this;
+
+	if (currentDayOfWeek != undefined) {
+		vis.currentDay = currentDayOfWeek;
+	}
 
 	var selection = vis.svg.selectAll("rect").data(vis.aggregatedDataArray);
 
 	//constants for styling
-	const color = "grey";
+	const color = "darkgrey";
+	const highlight = "#505050"
 
 	//enter
 	selection.enter().append("rect")
 	.attr("width", vis.barWidth)
-	.attr("x", (d)=> vis.xScale(d.date))
-	.attr("fill", color)
+	.attr("x", (d)=> vis.xScale(d.date.getDay()) + 10)
+	.attr("fill", d => {
+		if (d.date.getDay()==vis.currentDay) {
+			return highlight;
+		}
+		else {
+			return color;
+		}
+	})
 	.attr("height", d => vis.height - vis.heightScale(vis.usageDataOfInterest(d)))
 	.attr("y", d => {
 		return vis.heightScale(vis.usageDataOfInterest(d));
@@ -113,6 +133,16 @@ WeeklyUsageChart.prototype.updateVis = function() {
 
 	//update
 	selection
+	.transition()
+	.duration(500)
+	.attr("fill", d => {
+		if (d.date.getDay()==vis.currentDay) {
+			return highlight;
+		}
+		else {
+			return color;
+		}
+	})
 	.transition()
 	.duration(750)
 	.attr("y", d => {
@@ -138,7 +168,7 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	.call(vis.xAxis)
 
 	vis.svg.selectAll(".x-axis text")
-	.attr("transform", "translate(15, 5)")
+	.attr("transform", "translate(25, 5)")
 }
 
 WeeklyUsageChart.prototype.changeSelectedStations = function(stations){
@@ -164,7 +194,7 @@ WeeklyUsageChart.prototype.setScaleDomain = function(){
 
 	// console.log(vis.heightScale.domain());
 
-	vis.xScale.domain([vis.startDate, vis.endDate])
+	vis.xScale.domain([0, 7])
 
 	vis.yAxis.scale(this.heightScale);
 	vis.xAxis.scale(this.xScale);
