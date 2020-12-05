@@ -31,7 +31,7 @@ DailyUsageChart.prototype.initVis = function() {
     vis.hourBlocks = ["12am", "4am", "8am", "12pm", "4pm", "8pm"];
     vis.conciseHourBlocks = ["2am", "6am", "10am", "2pm", "6pm", "10pm"];
 
-    vis.barWidth = 30;
+    vis.barWidth = 40;
     
 
   	// SVG drawing area
@@ -135,8 +135,6 @@ DailyUsageChart.prototype.updateVis = function() {
 
 	//update
 	selection
-	.transition()
-	.duration(500)
 	.attr("fill", (d,i) => {
 		if (i==vis.currentHourBlock) {
 			return highlight;
@@ -145,6 +143,8 @@ DailyUsageChart.prototype.updateVis = function() {
 			return color;
 		}
     })
+    .transition()
+	.duration(500)
 	.attr("height", d => vis.height - vis.heightScale(d))
 	.attr("y", d => {
 		return vis.heightScale(d);
@@ -168,7 +168,7 @@ DailyUsageChart.prototype.updateVis = function() {
 	.call(vis.xAxis)
 
 	vis.svg.selectAll(".x-axis text")
-	.attr("transform", "translate(25, 5)")
+	.attr("transform", "translate(30, 5)")
 }
 
 DailyUsageChart.prototype.changeSelectedStations = function(stations){

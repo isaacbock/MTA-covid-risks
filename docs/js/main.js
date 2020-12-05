@@ -90,9 +90,9 @@ function createVis() {
 	// Instantiate visualization
 	stationMap.refresh("station-map", metroDataHourly, daysOfWeek, covidData, neighborhoodData, lineData, [40.7350, -73.7800], [showStations, showLines, showCOVID]);
 	dailyUsageChart = new DailyUsageChart("daily-usage", metroDataHourly);
-	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", metroDataDaily, "2020-10-14 EST");
+	weeklyUsageChart = new WeeklyUsageChart("weekly-usage", metroDataHourly);
 	timeSelector = new TimeSelector("time-overlay", [showStations, showLines, showCOVID]);
-	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", metroDataDaily, "2020-11-27 EST");
+	yearToDateUsageChart = new YearToDateUsageChart("year-to-date-usage", metroDataDaily, "2020-12-05 EST");
 	covidRisk = new CovidRisk("covid-risk", "positivity-rates", covidData, neighborhoodData);
 	stationSuggestions = new StationSuggestions("station-suggestions", metroDataDaily);
 
@@ -147,5 +147,5 @@ function selectStations(stations) {
 function changeCurrentTime(day, hour) {
 	stationMap.wrangleData(day, hour);
 	dailyUsageChart.wrangleData(day, hour);
-	weeklyUsageChart.updateVis(day);
+	weeklyUsageChart.wrangleData(day);
 }

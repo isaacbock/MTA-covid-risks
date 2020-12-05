@@ -67,7 +67,6 @@ button:focus {
 	padding-left: 30px;
 	display: flex;
 	align-items: center;
-	/* justify-content: space-between; */
 }
 #header > a {
 	color: rgba(255, 255, 255, 0.5);
