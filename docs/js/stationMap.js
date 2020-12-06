@@ -469,26 +469,23 @@ StationMap.prototype.selectStations = function (_stations) {
   // if some stations are selected, the rest should be somewhat desaturated for contrast
   if (vis.selectedStations.length != 0) {
     vis.allStations.forEach((station) => {
-      if (
-        vis.selectedStations.some(
-          (d) =>
-            d.name === station.name &&
-            d.latitude === station.latitude &&
-            d.longitude === station.longitude
-        )
-      ) {
-        $(station._icon).removeClass("unselected");
+      if (vis.selectedStations.some(d => d.id === station.id)) {
+		$(station._icon).removeClass("unselected");
+		station.selected = true;
       } else {
-        $(station._icon).addClass("unselected");
+		$(station._icon).addClass("unselected");
+		station.selected = false;
       }
     });
   }
   // else if no stations are selected, all should be displayed in full color
   else {
     vis.allStations.forEach((station) => {
-      $(station._icon).removeClass("unselected");
+	  $(station._icon).removeClass("unselected");
+	  station.selected = false;
     });
   }
+  console.log(vis.allStations.filter(d => d.selected))
 };
 
 /*

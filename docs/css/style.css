@@ -158,6 +158,9 @@ hr {
 .station-marker.mouseover > div {
   opacity: 1 !important;
 }
+.station-marker.unselected.mouseover > div {
+	opacity: .75 !important;
+}
 
 #time-overlay {
   position: absolute;

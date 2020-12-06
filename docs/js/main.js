@@ -27,7 +27,7 @@ stationMap = new StationMap(
   [],
   [],
   [],
-  [40.735, -73.78],
+  [40.73, -73.8],
   [showStations, showLines, showCOVID]
 );
 
@@ -222,7 +222,6 @@ function changeCurrentTime(day, hour) {
 }
 
 const toggleStation = (s) => {
-  console.log("CLICKED ME");
   //   const s = stationMap.allStations.filter((d) => d.id == 416)[0];
   stationMap.toggleStationSelect(s);
 };
