@@ -8,4 +8,4 @@ Data and reference sources cited within our [Process Book](https://washuvis.gith
 - [jQuery](https://jquery.com/)
 - [Bootstrap](https://getbootstrap.com/)
 - [Turf.js](https://turfjs.org/) (used to map station geographical coordinates to local zip codes)
-- [React.js] (https://reactjs.org/)
+- [React.js](https://reactjs.org/)
