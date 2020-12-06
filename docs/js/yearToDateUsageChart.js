@@ -46,11 +46,11 @@ YearToDateUsageChart.prototype.initVis = function() {
 	vis.tip = d3.tip().attr('class', 'd3-tip')
 	.direction('n')
 	.offset(function() {
-		return [0, 0];
+		return [10, 0];
 	})
 	.style('z-index', 99999)
 	.html(function(event, data){
-		console.log(data);
+		data.average = Math.round(data.average);
 		let text = "";
 		text += data.startDateString;
 		text += "-";
@@ -101,6 +101,7 @@ YearToDateUsageChart.prototype.initVis = function() {
 		d3.selectAll(".end").attr("offset", gradientResetPercentage);
 		d3.select('.year1').text('');
 		d3.select('.year2').text('');
+		vis.tip.hide(event);
 	}
 
 	// Area and Path
