@@ -5,6 +5,8 @@
  *  @param endDate      	-- String represents date of interest
  */
 
+const gradientResetPercentage = "50%";
+
 YearToDateUsageChart = function(_parentElement, _metroData, _endDate) {
 
 	this.parentElement = _parentElement;
@@ -36,15 +38,42 @@ YearToDateUsageChart.prototype.initVis = function() {
 	// Initialize Scales and Axex
 	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
 	vis.xScale = d3.scaleTime().range([0, vis.width]);
-	vis.colorScale = d3.scaleLinear()
-					.range(["Red", "lightsteelblue", "grey"])
 
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
 	
+	function handleMouseMove(event, data) {
+		const currentXPosition = d3.pointer(event)[0];
+		// Get the x value of the current X position
+		const xValue = vis.xScale.invert(currentXPosition);
+	
+		const bisectDate = d3.bisector(dataPoint => dataPoint.date).left;
+	
+		// Get the index of the xValue relative to the dataSet
+		const dataIndex = bisectDate(data, xValue, 1);
+		const leftData = vis.aggregatedDataArray[dataIndex - 3];
+		const rightData = vis.aggregatedDataArray[dataIndex + 3];
+	
+		// Update gradient
+		const x1Percentage = vis.xScale(leftData?.date) / vis.width * 100;
+		const x2Percentage = vis.xScale(rightData?.date) / vis.width * 100;
+
+		d3.selectAll(".start").attr("offset", `${isNaN(x1Percentage)? 0:x1Percentage}%`);
+		d3.selectAll(".end").attr("offset", `${isNaN(x2Percentage)? 100 : x2Percentage}%`);
+	  }
+	
+	function handleMouseOut(event, data) {
+		d3.selectAll(".start").attr("offset", gradientResetPercentage);
+		d3.selectAll(".end").attr("offset", gradientResetPercentage);
+		d3.select('.year1').text('');
+		d3.select('.year2').text('')
+	}
+
 	// Area and Path
 	vis.path = vis.svg.append("path")
-		.attr("class", "area");
+		.attr("class", "area")
+		.on("mousemove", handleMouseMove)
+		.on("mouseout", handleMouseOut);
 
 	vis.area = d3.area()
 	.x(d => vis.xScale(d.date))
@@ -103,9 +132,30 @@ YearToDateUsageChart.prototype.wrangleData = function() {
 
 YearToDateUsageChart.prototype.updateVis = function() {
 	vis = this;
+		  
+	//"tooltip" gradient: https://medium.com/@louisemoxy/create-an-accurate-tooltip-for-a-d3-area-chart-bf59783f8a2d
+	const defs = vis.svg.append("defs");
+	const gradient = defs.append("linearGradient").attr("id", "svgGradient");
 
-	//var selection = vis.svg.selectAll("rect").data(vis.aggregatedDataArray);
+	gradient
+	.append("stop")
+	.attr("class", "start")
+	.attr("offset", gradientResetPercentage)
+	.attr("stop-color", "lightblue");
 
+	gradient
+  	.append("stop")
+  	.attr("class", "end")
+  	.attr("offset", gradientResetPercentage)
+  	.attr("stop-color", "darkblue")
+	.attr("stop-opacity", 1);
+	  
+	gradient
+	.append("stop")
+	.attr("class", "end")
+	.attr("offset", gradientResetPercentage)
+	.attr("stop-color", "lightblue");
+	
 	//constants for styling
 	const color = "lightsteelblue";
 
@@ -114,7 +164,7 @@ YearToDateUsageChart.prototype.updateVis = function() {
 	.transition()
 	.attr("d", vis.area)
 	.style("fill", d=>{
-		return "red";
+		return "url(#svgGradient)";
 	});
 
 	//TODO draw axis and labels
@@ -156,10 +206,6 @@ YearToDateUsageChart.prototype.setScaleDomain = function(){
 		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
 	])
 
-	vis.colorScale.domain([
-		0,
-		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
-	])
 	vis.xScale.domain([vis.aggregatedDataArray[0].date, vis.endDate])
 
 	vis.area = d3.area()
