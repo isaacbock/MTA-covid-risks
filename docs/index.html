@@ -18,9 +18,10 @@
 </head>
 <body>
 
-	<div id="header">
-		<h1>NYC Metro COVID-19 Risks</h1>
+	<div  id="header">
+		<h1 >NYC Metro COVID-19 Risks</h1>
 		<a href="processBook.html">Process Book</a>
+		<div id="search-div"></div>
 	</div>
 
 	<div id="loading-screen">
@@ -47,18 +48,35 @@
 			<button id="now-button">Now</button>
 			<button id="clear-button">Clear Stations</button>
 		</div>
-		<div>
-			<input type="checkbox" id="show-stations" name="Metro Stations">
-			<label for="show-stations">Metro Stations</label>
+		<div id="checkboxes">
+			<div>
+				<input type="checkbox" id="show-stations" name="Metro Stations">
+				<label for="show-stations">Metro Stations</label>
+			</div>
+			<div>
+				<input type="checkbox" id="show-lines" name="Metro Lines">
+				<label for="show-lines">Metro Lines</label>
+			</div>
+			<div>
+				<input type="checkbox" id="show-COVID-rates" name="COVID Rates">
+				<label for="show-COVID-rates">COVID-19 Rates</label>
+			</div>
 		</div>
-		<div>
-			<input type="checkbox" id="show-lines" name="Metro Lines">
-			<label for="show-lines">Metro Lines</label>
+		<div class="legend">
+			<h4>Station Traffic</h4>
+			<div id="station-legend" class="legend-colors"></div>
+			<div class="legend-axis"><p>0/hr</p><p>250/hr</p><p>500+/hr</p></div>
 		</div>
-		<div>
-			<input type="checkbox" id="show-COVID-rates" name="COVID Rates">
-		<label for="show-COVID-rates">COVID-19 Rates</label>
+		<div class="legend">
+			<h4>COVID-19 Rates</h4>
+			<div id="covid-legend" class="legend-colors"></div>
+			<div class="legend-axis"><p>0%</p><p>1.5%</p><p>3%</p><p>4.5%</p><p>6%</p><p>7.5%</p></div>
 		</div>
+		<div id="as-of">
+			<h5><a href="http://web.mta.info/developers/turnstile.html">MTA usage</a> as of <span id="metro-as-of"></span>.</h4>
+			<h5><a href="https://github.com/nychealth/coronavirus-data/blob/master/trends/percentpositive-by-modzcta.csv">COVID-19 rates</a> as of <span id="covid-as-of"></span>.</h4>
+		</div>
+	</div>
 		
 	
 		
@@ -105,7 +123,10 @@
 	<script src="js/lib/d3.v6.min.js"></script>
 	<script src="js/lib/leaflet.js"></script>
 	<script src="js/lib/d3-tip/index.js"></script>
-	
+	<!-- React Libs -->
+	<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 	<!-- Utility libraries -->
 	<script src="js/dateTimeUtils.js"></script>
 	<script src="js/lib/turf.min.js"></script>
@@ -126,6 +147,6 @@
 
 	<!-- Load data, create visualizations -->
 	<script src="js/main.js"></script>
-
+	<script src="js/SearchBar.js" type="text/babel"></script>
 </body>
 </html>

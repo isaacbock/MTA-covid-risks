@@ -25,8 +25,8 @@ CovidRisk = function(_parentElement, _svgElement, _covidData, _neighborhoodData)
 CovidRisk.prototype.initVis = function() {
     var vis = this;
 
-    vis.highCutoff = 4;
-    vis.mediumCutoff = 2;
+    vis.highCutoff = 5;
+    vis.mediumCutoff = 2.5;
 
 	vis.margin = {top: 30, right: 30, bottom: 20, left: 30};
 	vis.width = 200 - vis.margin.left - vis.margin.right;
