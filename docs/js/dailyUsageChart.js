@@ -18,8 +18,8 @@ DailyUsageChart = function(_parentElement, _metroData) {
 DailyUsageChart.prototype.initVis = function() {
     var vis = this;
 
-    vis.highCutoff = 1000;
-    vis.mediumCutoff = 500;
+    vis.highCutoff = 375;
+    vis.mediumCutoff = 125;
 
     vis.margin = { top: 40, right: 0, bottom: 40, left: 60 };
 
@@ -113,15 +113,16 @@ DailyUsageChart.prototype.wrangleData = function(currentDay, currentHourBlock) {
 DailyUsageChart.prototype.updateVis = function() {
     vis = this;
 
-    let totalCount = vis.aggregateCounts[vis.currentHourBlock] / (vis.selectedStations.length==0 ? 425:vis.selectedStations.length)
-    if (totalCount >= vis.highCutoff) {
+    let totalCount = vis.aggregateCounts[vis.currentHourBlock] / (vis.selectedStations.length==0 ? 425:vis.selectedStations.length);
+    let hourlyCount = totalCount/4;
+    if (hourlyCount >= vis.highCutoff) {
         $("#station-usage-level").text("HIGH").removeClass("low").removeClass("medium").addClass("high");
     }
-    else if (totalCount >= vis.mediumCutoff) {
+    else if (hourlyCount >= vis.mediumCutoff) {
         $("#station-usage-level").text("MEDIUM").removeClass("low").addClass("medium").removeClass("high");
     }
     else {
-        $("#station-usage-level").text("LOWER").addClass("low").removeClass("medium").removeClass("high");
+        $("#station-usage-level").text("LOW").addClass("low").removeClass("medium").removeClass("high");
 	}
 	
 

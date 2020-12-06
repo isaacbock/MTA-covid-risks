@@ -102,6 +102,10 @@ function createVis() {
 	$("#start-button").addClass("active").text("BEGIN").click(function() {
 		$("#loading-screen").fadeOut(250);
 	});
+
+	// Update data "as-of" text
+	$("#metro-as-of").text(moment(metroDataHourly[metroDataHourly.length - 1].date).format("MM/DD/YYYY"));
+	$("#covid-as-of").text(covidData["week_ending"]);
 }
 
 function toggleLayers(stations, lines, covid) {

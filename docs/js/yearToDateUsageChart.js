@@ -23,7 +23,7 @@ YearToDateUsageChart = function(_parentElement, _metroData, _endDate) {
 YearToDateUsageChart.prototype.initVis = function() {
     var vis = this;
 
-    vis.margin = { top: 10, right: 0, bottom: 40, left: 60 };
+    vis.margin = { top: 10, right: 20, bottom: 40, left: 70 };
 
 	vis.width = 400 - vis.margin.left - vis.margin.right,
     vis.height = 125 - vis.margin.top - vis.margin.bottom;

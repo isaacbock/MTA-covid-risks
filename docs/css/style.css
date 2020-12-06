@@ -26,6 +26,13 @@ h4 {
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
+h5 {
+	font-size: 10px;
+	font-weight: normal;
+	margin: 0;
+	padding: 0;
+	letter-spacing: 0.5px;
+}
 p {
 	margin: 0;
 	margin-bottom: 10px;
@@ -144,25 +151,12 @@ hr {
 .station-marker {
 	border-radius: 50%;
 	box-shadow: 0px 0px 10px black;
-	/* transition: 750ms; */
 }
-.station-marker.low {
-	background-color: rgb(0,255,0);
+.station-marker.unselected > div {
+	opacity: .25;
 }
-.station-marker.low.unselected {
-	background-color: hsl(120, 35%, 50%);
-}
-.station-marker.medium {
-	background-color:rgb(255, 255, 0);
-}
-.station-marker.medium.unselected {
-	background-color:hsl(60, 23%, 50%);
-}
-.station-marker.high {
-	background-color: rgb(255, 0, 0);
-}
-.station-marker.high.unselected {
-	background-color: hsl(0, 35%, 50%);
+.station-marker.mouseover > div {
+	opacity: 1 !important;
 }
 
 #time-overlay {
@@ -173,6 +167,7 @@ hr {
 	border-radius: 20px;
 	z-index: 99;
 	padding: 20px;
+	padding-bottom: 15px;
 	display: flex;
 	flex-direction: column;
 	justify-content: start;
@@ -203,7 +198,7 @@ input[type=range] {
 	align-items: center;
 	justify-content: space-evenly;
 	margin-top: 5px;
-	margin-bottom: 20px;
+	margin-bottom: 15px;
 }
 #reset-buttons > button {
 	display: inline-block;
@@ -221,6 +216,30 @@ input[type=range] {
 	color: white;
 	background-color: #1E90FF;
 	transition: 500ms;
+}
+#checkboxes {
+	margin-bottom: 10px;
+}
+.legend, .legend-colors, .legend-axis {
+	width: 100%;
+	font-size: 10px;
+}
+.legend {
+	margin-top: 10px;
+}
+.legend-colors {
+	height: 15px;
+}
+.legend-axis {
+	display: flex;
+	justify-content: space-between;
+}
+.legend-axis > p {
+	margin: 3px;
+}
+#as-of {
+	margin-top: 10px;
+	margin-left: 5px;
 }
 
 #detail-overlay {

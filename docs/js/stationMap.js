@@ -37,6 +37,18 @@ StationMap = function(_parentElement, _metroData, _daysOfWeek, _covidData, _neig
 StationMap.prototype.initVis = function() {
 	var vis = this;
 
+	vis.stationColorScale = d3.scaleLinear().domain([0, 250, 500]).range(["rgb(0,255,0)", "rgb(255, 255, 0)", "rgb(255, 0, 0)"]);
+	vis.covidColorScale = d3.scaleLinear().domain([0, 7.5, 100]).range(["white", "rgb(0, 30, 130)", "rgb(0, 30, 130)"]);
+
+	let stationStartingColor = vis.stationColorScale(vis.stationColorScale.domain()[0]);
+	let stationMiddleColor = vis.stationColorScale(vis.stationColorScale.domain()[1]);
+	let stationEndingColor = vis.stationColorScale(vis.stationColorScale.domain()[2]);
+	$("#station-legend").css({background:'linear-gradient(to right, ' + stationStartingColor + ', '+ stationMiddleColor +', ' + stationEndingColor + ')'});
+
+	let covidStartingColor = vis.covidColorScale(vis.covidColorScale.domain()[0]);
+	let covidEndingColor = vis.covidColorScale(vis.covidColorScale.domain()[1]);
+	$("#covid-legend").css({background:'linear-gradient(to right, ' + covidStartingColor + ', ' + covidEndingColor + ')'});
+
 	vis.allStations = [];
 	vis.selectedStations = [];
 	vis.currentHourStrings = ["tot_12am", "tot_4am", "tot_8am", "tot_12pm", "tot_4pm", "tot_8pm"];
@@ -99,30 +111,15 @@ StationMap.prototype.createVis = function() {
 	vis.displayData.forEach(station => {
 	
 		// Create custom icon (via https://www.geoapify.com/create-custom-map-marker-icon) based on number of passengers at each station
-		// Currently <5k is low activity, <10k is medium activity, and >=10k is high activity
 		let totalVisitors = station[vis.currentHourStrings[vis.currentHour]];
-		let icon;
-		if (totalVisitors < 500) {
-			icon = L.divIcon({
-				className: "station-marker low",
-				iconSize: [10, 10],
-				iconAnchor: [5, 5]
-			});
-		}
-		else if (totalVisitors < 1000) {
-			icon = L.divIcon({
-				className: "station-marker medium",
-				iconSize: [10, 10],
-				iconAnchor: [5, 5]
-			});
-		}
-		else {
-			icon = L.divIcon({
-				className: "station-marker high",
-				iconSize: [10, 10],
-				iconAnchor: [5, 5]
-			});
-		}
+		let color = vis.stationColorScale(totalVisitors/4);
+		let style = "<div style= 'background-color:"+color+"; width:100%; height:100%; border-radius: 50%' />";
+		let icon = L.divIcon({
+			className: "station-marker",
+			html: style,
+			iconSize: [10, 10],
+			iconAnchor: [5, 5]
+		});
 
 		// Popup content
 		let popupContent = "<strong>"+ station.name + "</strong><br/>";
@@ -133,12 +130,15 @@ StationMap.prototype.createVis = function() {
 			// .bindPopup(popupContent)
 			.bindTooltip(popupContent)
 			.addTo(vis.map);
+		
 		marker.name = station.name;
 		marker.latitude = station.lat;
 		marker.longitude = station.long;
 		marker.id = station.id;
 		marker.selected = false;
-		marker.on('click', onStationClick);
+		marker.on("click", onStationClick);
+		marker.on("mouseover", mouseover);
+		marker.on("mouseout", mouseout);
 		vis.allStations.push(marker);
 
 		function onStationClick(e) {
@@ -154,6 +154,14 @@ StationMap.prototype.createVis = function() {
 				vis.selectedStations = vis.selectedStations.filter(d => d.latitude!==station.latitude && d.longitude!==station.longitude);
 			}
 			selectStations(vis.selectedStations);
+		}
+		function mouseover(e) {
+			let station = e.target;
+			$(station._icon).addClass("mouseover");
+		}
+		function mouseout(e) {
+			let station = e.target;
+			$(station._icon).removeClass("mouseover");
 		}
 	});
 
@@ -177,7 +185,7 @@ StationMap.prototype.createVis = function() {
 	// Add zip code overlays
 	L.geoJson(vis.neighborhoodData, {
 		style: styleZipCode,
-		weight: 0,
+		weight: 2,
 		pane: "COVID"
 	}).addTo(vis.map);
 	// Color zip codes by covid rates
@@ -185,25 +193,8 @@ StationMap.prototype.createVis = function() {
 		let zipCode = feature.properties.MODZCTA;
 		let lookupKey = "PCTPOS_" + zipCode;
 		let covidRate = vis.covidData[lookupKey];
-		
-		if (covidRate >= 5) {
-			return { fillColor: "#00308F", fillOpacity: .9, interactive: false };
-		}
-		else if (covidRate >= 4) {
-			return { fillColor: "#0643A5", fillOpacity: .75, interactive: false };
-		}
-		else if (covidRate >= 3) {
-			return { fillColor: "#0C56BC", fillOpacity: .6, interactive: false };
-		}
-		else if (covidRate >= 2) {
-			return { fillColor: "#126AD2", fillOpacity: .45, interactive: false };
-		}
-		else if (covidRate >= 1) {
-			return { fillColor: "#187DE9", fillOpacity: .2, interactive: false };
-		}
-		else {
-			return { fillColor: "#1E90FF", fillOpacity: .1, interactive: false };
-		}
+		let color = vis.covidColorScale(covidRate)
+		return { color: color, fillColor: color, colorOpacity: 1, fillOpacity: .9, interactive: false };
 	}
 
 	// Add MTA lines
@@ -266,31 +257,17 @@ StationMap.prototype.updateVis = function() {
 			let marker = vis.allStations.find(d => d.id==station.id);
 			// console.log(marker)
 			
+			// Create custom icon (via https://www.geoapify.com/create-custom-map-marker-icon) based on number of passengers at each station
 			let totalVisitors = station[vis.currentHourStrings[vis.currentHour]];
-			if (totalVisitors < 500) {
-				icon = L.divIcon({
-					className: "station-marker low",
-					iconSize: [10, 10],
-					iconAnchor: [5, 5]
-				});
-				marker.setIcon(icon);
-			}
-			else if (totalVisitors < 1000) {
-				icon = L.divIcon({
-					className: "station-marker medium",
-					iconSize: [10, 10],
-					iconAnchor: [5, 5]
-				});
-				marker.setIcon(icon);
-			}
-			else {
-				icon = L.divIcon({
-					className: "station-marker high",
-					iconSize: [10, 10],
-					iconAnchor: [5, 5]
-				});
-				marker.setIcon(icon);
-			}
+			let color = vis.stationColorScale(totalVisitors/4);
+			let style = "<div style= 'background-color:"+color+"; width:100%; height:100%; border-radius: 50%' />";
+			let icon = L.divIcon({
+				className: "station-marker",
+				html: style,
+				iconSize: [10, 10],
+				iconAnchor: [5, 5]
+			});
+			marker.setIcon(icon);
 
 			// Popup content
 			let popupContent = "<strong>"+ station.name + "</strong><br/>";
