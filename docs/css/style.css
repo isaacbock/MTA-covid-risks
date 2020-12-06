@@ -303,3 +303,15 @@ input[type=range] {
 	margin-top: 15px;
 	margin-bottom: 20px;
 }
+.d3-tip{
+	line-height: 1;
+	font-weight: bold;
+	font-size: 13px;
+	padding: 6px;
+	background: rgba(252, 252, 252, 0.8);
+	color: rgb(0, 0, 0);
+	border-radius: 10px;
+	border-style: solid;
+	border-width: 1px;
+	z-index:9999;
+}
