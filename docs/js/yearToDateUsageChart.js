@@ -42,6 +42,26 @@ YearToDateUsageChart.prototype.initVis = function() {
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
 	
+	//Tool tip
+	vis.tip = d3.tip().attr('class', 'd3-tip')
+	.direction('n')
+	.offset(function() {
+		return [0, 0];
+	})
+	.style('z-index', 99999)
+	.html(function(event, data){
+		console.log(data);
+		let text = "";
+		text += data.startDateString;
+		text += "-";
+		text += data.endDateString;
+		text += "<br>";
+		text += "average: " + data.average + "/day";
+		return text;
+	})
+
+	vis.svg.call(vis.tip);
+		
 	function handleMouseMove(event, data) {
 		const currentXPosition = d3.pointer(event)[0];
 		// Get the x value of the current X position
@@ -51,22 +71,36 @@ YearToDateUsageChart.prototype.initVis = function() {
 	
 		// Get the index of the xValue relative to the dataSet
 		const dataIndex = bisectDate(data, xValue, 1);
-		const leftData = vis.aggregatedDataArray[dataIndex - 3];
-		const rightData = vis.aggregatedDataArray[dataIndex + 3];
-	
+		const leftIndex = dataIndex-3 < 0? 0 : dataIndex-3;
+		const rightIndex = dataIndex+3 >= vis.aggregatedDataArray.length? vis.aggregatedDataArray.length-1 : dataIndex + 3;
+		const leftData = vis.aggregatedDataArray[leftIndex];
+		const rightData = vis.aggregatedDataArray[rightIndex];
+		
 		// Update gradient
-		const x1Percentage = vis.xScale(leftData?.date) / vis.width * 100;
-		const x2Percentage = vis.xScale(rightData?.date) / vis.width * 100;
+		const x1Percentage = vis.xScale(leftData.date) / vis.width * 100;
+		const x2Percentage = vis.xScale(rightData.date) / vis.width * 100;
 
-		d3.selectAll(".start").attr("offset", `${isNaN(x1Percentage)? 0:x1Percentage}%`);
-		d3.selectAll(".end").attr("offset", `${isNaN(x2Percentage)? 100 : x2Percentage}%`);
+		d3.selectAll(".start").attr("offset", `${x1Percentage}%`);
+		d3.selectAll(".end").attr("offset", `${x2Percentage}%`);
+
+		let averageUsage = 0;
+		for(i=leftIndex; i <= rightIndex; i++){
+			averageUsage += vis.usageDataOfInterest(vis.aggregatedDataArray[i]);
+		}
+		averageUsage /= (rightIndex - leftIndex + 1);
+
+		let displayData = {};
+		displayData.startDateString = getDateString(leftData.date);
+		displayData.endDateString = getDateString(rightData.date);
+		displayData.average = averageUsage;
+		vis.tip.show(event, displayData);
 	  }
 	
 	function handleMouseOut(event, data) {
 		d3.selectAll(".start").attr("offset", gradientResetPercentage);
 		d3.selectAll(".end").attr("offset", gradientResetPercentage);
 		d3.select('.year1').text('');
-		d3.select('.year2').text('')
+		d3.select('.year2').text('');
 	}
 
 	// Area and Path
