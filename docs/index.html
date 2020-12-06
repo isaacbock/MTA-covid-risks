@@ -18,9 +18,10 @@
 </head>
 <body>
 
-	<div id="header">
-		<h1>NYC Metro COVID-19 Risks</h1>
+	<div  id="header">
+		<h1 >NYC Metro COVID-19 Risks</h1>
 		<a href="processBook.html">Process Book</a>
+		<div id="search-div"></div>
 	</div>
 
 	<div id="loading-screen">
@@ -122,7 +123,10 @@
 	<script src="js/lib/d3.v6.min.js"></script>
 	<script src="js/lib/leaflet.js"></script>
 	<script src="js/lib/d3-tip/index.js"></script>
-	
+	<!-- React Libs -->
+	<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 	<!-- Utility libraries -->
 	<script src="js/dateTimeUtils.js"></script>
 	<script src="js/lib/turf.min.js"></script>
@@ -143,6 +147,6 @@
 
 	<!-- Load data, create visualizations -->
 	<script src="js/main.js"></script>
-
+	<script src="js/SearchBar.js" type="text/babel"></script>
 </body>
 </html>
