@@ -36,6 +36,8 @@ YearToDateUsageChart.prototype.initVis = function() {
 	// Initialize Scales and Axex
 	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
 	vis.xScale = d3.scaleTime().range([0, vis.width]);
+	vis.colorScale = d3.scaleLinear()
+					.range(["Red", "lightsteelblue", "grey"])
 
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
@@ -105,12 +107,15 @@ YearToDateUsageChart.prototype.updateVis = function() {
 	//var selection = vis.svg.selectAll("rect").data(vis.aggregatedDataArray);
 
 	//constants for styling
-	const color = "grey";
+	const color = "lightsteelblue";
 
 	vis.path
 	.datum(vis.aggregatedDataArray)
 	.transition()
-	.attr("d", vis.area);
+	.attr("d", vis.area)
+	.style("fill", d=>{
+		return "red";
+	});
 
 	//TODO draw axis and labels
 	vis.svg.selectAll(".y-axis").remove();
@@ -151,6 +156,10 @@ YearToDateUsageChart.prototype.setScaleDomain = function(){
 		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
 	])
 
+	vis.colorScale.domain([
+		0,
+		d3.max(vis.aggregatedDataArray, d => vis.usageDataOfInterest(d))
+	])
 	vis.xScale.domain([vis.aggregatedDataArray[0].date, vis.endDate])
 
 	vis.area = d3.area()

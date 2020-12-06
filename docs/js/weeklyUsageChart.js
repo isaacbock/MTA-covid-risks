@@ -42,6 +42,19 @@ WeeklyUsageChart.prototype.initVis = function() {
 	vis.xAxis = d3.axisBottom().tickFormat(d => vis.daysOfWeek[d]).ticks(7).tickSize(0);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
 
+	//Tool tip
+	vis.tip = d3.tip().attr('class', 'd3-tip')
+	.direction('n')
+	.offset(function() {
+		return [-10, 0];
+	})
+	.style('z-index', 99999)
+	.html(function(event, data){
+		return data;
+	})
+	
+	vis.svg.call(vis.tip);
+
 	vis.wrangleData();
 }
 
@@ -108,7 +121,9 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	.attr("height", d => vis.height - vis.heightScale(d))
 	.attr("y", d => {
 		return vis.heightScale(d);
-	});
+	})
+	.on('mouseover', vis.tip.show)
+	.on('mouseout', vis.tip.hide);
 
 	//update
 	selection
