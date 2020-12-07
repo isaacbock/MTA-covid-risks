@@ -21,6 +21,8 @@ StationSuggestions = function(_parentElement, _metroData) {
 StationSuggestions.prototype.initVis = function() {
     var vis = this;
 
+    vis.hourBlocks = ["12am", "4am", "8am", "12pm", "4pm", "8pm"];
+
     // By default, no stations are selected
     vis.selectedStations = [];
 
@@ -31,22 +33,28 @@ StationSuggestions.prototype.initVis = function() {
  *  Data wrangling
  */
 
-StationSuggestions.prototype.wrangleData = function(_selectedStations) {
+StationSuggestions.prototype.wrangleData = function(currentDay, currentHourBlock) {
     var vis = this;
-
     let maxDistanceMiles = .5;
 
+    if (currentDay != undefined && currentHourBlock != undefined) {
+        vis.currentDay = currentDay;
+		vis.currentHourBlock = currentHourBlock;
+	}
+
     // if no stations selected, no recommendations can be made
-	if (_selectedStations == undefined || _selectedStations.length == 0) {
+	if (vis.selectedStations == undefined || vis.selectedStations.length == 0) {
         vis.stationSuggestions = "";
     }
     // else, determine which zip codes the selected stations are in (via Turf.js) and use only this data
     else {
-        vis.selectedStations = _selectedStations;
         vis.nearbyStations = []
 
+         // filter to current day
+        vis.filteredData = vis.metroData.filter(d => (new Date(d.date).getDay()==vis.currentDay));
+
         // find nearby stations
-        vis.metroData.forEach(station => {
+        vis.filteredData.forEach(station => {
             vis.selectedStations.forEach(selectedStation => {
                 var from = turf.point([station.long, station.lat]);
                 var to = turf.point([selectedStation.longitude, selectedStation.latitude]);
@@ -80,15 +88,15 @@ StationSuggestions.prototype.wrangleData = function(_selectedStations) {
         });
        
         // get metro rate of each selected station and nearby stations
-        vis.metroData.forEach(station => {
+        vis.filteredData.forEach(station => {
             vis.selectedStations.forEach(selectedStation => {
                 if (station.name==selectedStation.name && station.lat==selectedStation.latitude && station.long==selectedStation.longitude) {
-                    selectedStation.trafficCount = station.tot;
+                    selectedStation.trafficCount = station["tot_"+vis.hourBlocks[vis.currentHourBlock]];
                 }
             });
             vis.nearbyStations.forEach(nearbyStation => {
                 if (station.name==nearbyStation.station && station.lat==nearbyStation.latitude && station.long==nearbyStation.longitude) {
-                    nearbyStation.trafficCount = station.tot;
+                    nearbyStation.trafficCount = station["tot_"+vis.hourBlocks[vis.currentHourBlock]];
                 }
             });
         });
@@ -122,4 +130,9 @@ StationSuggestions.prototype.updateVis = function() {
     
     $("#station-suggestions").html(vis.stationSuggestions);
 
+}
+
+StationSuggestions.prototype.changeSelectedStations = function(stations){
+	this.selectedStations = stations;
+	this.wrangleData();
 }

@@ -90,22 +90,22 @@ function processData(
   self.metroDataDaily = self.metroDataDaily.filter(
     (record) =>
       record.station != "Newark Penn Station" &&
-      record.stop_name != "Harrison" &&
-      record.stop_name != "Journal Sq" &&
-      record.stop_name != "Grove St" &&
-      record.stop_name != "Pavonia/Newport" &&
-      record.stop_name != "Hoboken" &&
-      record.stop_name != "Exchange Pl"
+      record.station != "Harrison" &&
+      record.station != "Journal Sq" &&
+      record.station != "Grove St" &&
+      record.station != "Pavonia/Newport" &&
+      record.station != "Hoboken" &&
+      record.station != "Exchange Pl"
   );
   self.metroDataHourly = self.metroDataHourly.filter(
     (record) =>
       record.station != "Newark Penn Station" &&
-      record.stop_name != "Harrison" &&
-      record.stop_name != "Journal Sq" &&
-      record.stop_name != "Grove St" &&
-      record.stop_name != "Pavonia/Newport" &&
-      record.stop_name != "Hoboken" &&
-      record.stop_name != "Exchange Pl"
+      record.station != "Harrison" &&
+      record.station != "Journal Sq" &&
+      record.station != "Grove St" &&
+      record.station != "Pavonia/Newport" &&
+      record.station != "Hoboken" &&
+      record.station != "Exchange Pl"
   );
 
   //all metro dates data for weekly usage chart, append timezone for correct date encoding / decoding
@@ -141,11 +141,6 @@ function createVis() {
   );
   dailyUsageChart = new DailyUsageChart("daily-usage", metroDataHourly);
   weeklyUsageChart = new WeeklyUsageChart("weekly-usage", metroDataHourly);
-  timeSelector = new TimeSelector("time-overlay", [
-    showStations,
-    showLines,
-    showCOVID,
-  ]);
   yearToDateUsageChart = new YearToDateUsageChart(
     "year-to-date-usage",
     metroDataDaily,
@@ -159,8 +154,13 @@ function createVis() {
   );
   stationSuggestions = new StationSuggestions(
     "station-suggestions",
-    metroDataDaily
+    metroDataHourly
   );
+  timeSelector = new TimeSelector("time-overlay", [
+    showStations,
+    showLines,
+    showCOVID,
+  ]);
 
   // Show visualization
   $("#time-overlay").fadeIn(1000);
@@ -215,7 +215,7 @@ function selectStations(stations) {
   // update other visualizations
   stationMap.selectStations(stations);
   covidRisk.wrangleData(stations);
-  stationSuggestions.wrangleData(stations);
+  stationSuggestions.changeSelectedStations(stations);
   dailyUsageChart.changeSelectedStations(stations);
   weeklyUsageChart.changeSelectedStations(stations);
   yearToDateUsageChart.changeSelectedStations(stations);
@@ -225,13 +225,9 @@ function changeCurrentTime(day, hour) {
   stationMap.wrangleData(day, hour);
   dailyUsageChart.wrangleData(day, hour);
   weeklyUsageChart.wrangleData(day);
+  stationSuggestions.wrangleData(day, hour);
 }
 
 const toggleStation = (s) => {
-  //   const s = stationMap.allStations.filter((d) => d.id == 416)[0];
   stationMap.toggleStationSelect(s);
 };
-
-// const el = document.getElementById("searcha");
-// console.log(el);
-// el.addEventListener("click", searchStations);
