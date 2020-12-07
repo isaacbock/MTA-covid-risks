@@ -40,11 +40,17 @@ $("#weekly-button").click(function () {
   $("#weekly-button").addClass("selected");
   $("#daily-button").removeClass("selected");
 });
+
 $("#daily-button").click(function () {
   $("#weekly-usage").hide();
   $("#daily-usage").show();
   $("#daily-button").addClass("selected");
   $("#weekly-button").removeClass("selected");
+});
+
+//handles zooming out
+$("#zoom-out-button").click(function () {
+  yearToDateUsageChart.resetZoom();
 });
 
 // Load data asynchronously

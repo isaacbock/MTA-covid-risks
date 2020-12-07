@@ -7,6 +7,7 @@
 
 const gradientResetPercentage = "50%";
 
+
 YearToDateUsageChart = function(_parentElement, _metroData, _endDate) {
 
 	this.parentElement = _parentElement;
@@ -39,98 +40,82 @@ YearToDateUsageChart.prototype.initVis = function() {
 	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
 	vis.xScale = d3.scaleTime().range([0, vis.width]);
 
+
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
 
 	//zoom
+
 	vis.zoom = d3.zoom()
     // Subsequently, you can listen to all zooming events
     .on("zoom", function(event, d){
-		// Do something
+
 		var transform = event.transform;
 
 		//create new scale object based on event
-		var new_xScale = transform.rescaleX(vis.x);
+		var new_xScale = transform.rescaleX(vis.xScale);
+		vis.new_xScale = new_xScale;
+
 		vis.svg.select('.x-axis')
-   		.call(vis.xAxis.scale(new_xScale));
-		vis.area.x(d => new_xScale(d.time));
-
-		// Define the clipping region
-		vis.svg.append("defs").append("clipPath")
-		.attr("id", "clip")
-		.append("rect")
-		.attr("width", vis.width)
-		.attr("height", vis.height);
-
+		   .call(vis.xAxis.scale(new_xScale));
+		   
+		vis.area.x(d => new_xScale(d.date));
+		
 		//And apply it to the path, brush and all other elements you want to clip
-		vis.timePath
-		.datum(vis.data)
-		.attr("d", vis.area)
-		.attr("clip-path", "url(#clip)");
-
 		vis.updateVis()
-    })
+	})
+	.scaleExtent([1,10])
+
+	
 	//Tool tip
 	vis.tip = d3.tip().attr('class', 'd3-tip')
 	.direction('n')
-	.offset(function() {
-		return [10, 0];
-	})
 	.style('z-index', 99999)
-	.html(function(event, data){
-		data.average = Math.round(data.average);
-		let text = "";
-		text += data.startDateString;
-		text += "-";
-		text += data.endDateString;
-		text += "<br>";
-		text += "average: " + data.average + "/day";
-		return text;
-	})
 
 	vis.svg.call(vis.tip);
 		
-	function handleMouseMove(event, data) {
-		const currentXPosition = d3.pointer(event)[0];
-		// Get the x value of the current X position
-		const xValue = vis.xScale.invert(currentXPosition);
-	
-		const bisectDate = d3.bisector(dataPoint => dataPoint.date).left;
-	
-		// Get the index of the xValue relative to the dataSet
-		const dataIndex = bisectDate(data, xValue, 1);
-		const leftIndex = dataIndex-3 < 0? 0 : dataIndex-3;
-		const rightIndex = dataIndex+3 >= vis.aggregatedDataArray.length? vis.aggregatedDataArray.length-1 : dataIndex + 3;
-		const leftData = vis.aggregatedDataArray[leftIndex];
-		const rightData = vis.aggregatedDataArray[rightIndex];
+		function handleMouseMove(event, data) {
+			const currentXPosition = d3.pointer(event)[0];
+			// Get the x value of the current X position
+			const xValue = vis.new_xScale? vis.new_xScale.invert(currentXPosition) : vis.xScale.invert(currentXPosition);
+			
+			const bisectDate = d3.bisector(dataPoint => dataPoint.date).left;
 		
-		// Update gradient
-		const x1Percentage = vis.xScale(leftData.date) / vis.width * 100;
-		const x2Percentage = vis.xScale(rightData.date) / vis.width * 100;
+			// Get the index of the xValue relative to the dataSet
+			const dataIndex = bisectDate(data, xValue, 1);
+			const leftIndex = dataIndex-3 < 0? 0 : dataIndex-3;
+			const rightIndex = dataIndex+3 >= vis.aggregatedDataArray.length? vis.aggregatedDataArray.length-1 : dataIndex + 3;
+			const leftData = vis.aggregatedDataArray[leftIndex];
+			const rightData = vis.aggregatedDataArray[rightIndex];
+			
+			// Update gradient
+			const x1Percentage = vis.xScale(leftData.date) / vis.width * 100;
+			const x2Percentage = vis.xScale(rightData.date) / vis.width * 100;
 
-		d3.selectAll(".start").attr("offset", `${x1Percentage}%`);
-		d3.selectAll(".end").attr("offset", `${x2Percentage}%`);
+			d3.selectAll(".start").attr("offset", `${x1Percentage}%`);
+			d3.selectAll(".end").attr("offset", `${x2Percentage}%`);
 
-		let averageUsage = 0;
-		for(i=leftIndex; i <= rightIndex; i++){
-			averageUsage += vis.usageDataOfInterest(vis.aggregatedDataArray[i]);
+			let averageUsage = 0;
+			for(i=leftIndex; i <= rightIndex; i++){
+				averageUsage += vis.usageDataOfInterest(vis.aggregatedDataArray[i]);
+			}
+			averageUsage /= (rightIndex - leftIndex + 1);
+
+			let displayData = {};
+			displayData.startDateString = getDateString(leftData.date);
+			displayData.endDateString = getDateString(rightData.date);
+			displayData.average = Math.round(averageUsage);
+			d3.select("#area-tooltip").text(displayData.startDateString + "-"+ displayData.endDateString+": " + displayData.average + "/day");
 		}
-		averageUsage /= (rightIndex - leftIndex + 1);
-
-		let displayData = {};
-		displayData.startDateString = getDateString(leftData.date);
-		displayData.endDateString = getDateString(rightData.date);
-		displayData.average = averageUsage;
-		vis.tip.show(event, displayData);
-	  }
 	
-	function handleMouseOut(event, data) {
-		d3.selectAll(".start").attr("offset", gradientResetPercentage);
-		d3.selectAll(".end").attr("offset", gradientResetPercentage);
-		d3.select('.year1').text('');
-		d3.select('.year2').text('');
-		vis.tip.hide(event);
-	}
+		function handleMouseOut(event, data) {
+			d3.selectAll(".start").attr("offset", gradientResetPercentage);
+			d3.selectAll(".end").attr("offset", gradientResetPercentage);
+			d3.select('.year1').text('');
+			d3.select('.year2').text('');
+			d3.select("#area-tooltip").text("");
+			vis.tip.hide(event);
+		}
 
 	// Area and Path
 	vis.path = vis.svg.append("path")
@@ -145,6 +130,7 @@ YearToDateUsageChart.prototype.initVis = function() {
 
 	vis.area.curve(d3.curveCardinal);
 
+	
 	vis.wrangleData();
 }
 
@@ -188,6 +174,19 @@ YearToDateUsageChart.prototype.wrangleData = function() {
 	// Set scale domain based on filtered data and station
 	vis.setScaleDomain();
 
+		// Define the clipping region
+		vis.svg.append("defs").append("clipPath")
+		.attr("id", "clip")
+		.append("rect")
+		.attr("width", vis.width)
+		.attr("height", vis.height);
+	
+		vis.path
+		.datum(vis.aggregatedDataArray)
+		.attr("d", vis.area)
+		.attr("clip-path", "url(#clip)");
+	
+
 	// Update the visualization
 	vis.updateVis();
 
@@ -195,11 +194,16 @@ YearToDateUsageChart.prototype.wrangleData = function() {
 
 YearToDateUsageChart.prototype.updateVis = function() {
 	vis = this;
+
+	// Call zoom component here
+	vis.svg.call(vis.zoom)
+	.on("mousedown.zoom", null)
+	.on("touchstart.zoom", null);
 		  
 	//"tooltip" gradient: https://medium.com/@louisemoxy/create-an-accurate-tooltip-for-a-d3-area-chart-bf59783f8a2d
 	const defs = vis.svg.append("defs");
 	const gradient = defs.append("linearGradient").attr("id", "svgGradient");
-
+	
 	gradient
 	.append("stop")
 	.attr("class", "start")
@@ -252,6 +256,7 @@ YearToDateUsageChart.prototype.updateVis = function() {
 YearToDateUsageChart.prototype.changeSelectedStations = function(stations){
 	this.selectedStations = stations;
 	this.setScaleDomain();
+	this.new_xScale = undefined;
 	this.updateVis();
 }
 
@@ -270,7 +275,6 @@ YearToDateUsageChart.prototype.setScaleDomain = function(){
 	])
 
 	vis.xScale.domain([vis.aggregatedDataArray[0].date, vis.endDate])
-
 	vis.area = d3.area()
 	.x(d => vis.xScale(d.date))
 	.y0(vis.height)
@@ -292,4 +296,9 @@ YearToDateUsageChart.prototype.usageDataOfInterest = function(d) {
 		}
 	});
 	return usage;
+}
+
+YearToDateUsageChart.prototype.resetZoom = function(){
+	vis = this;
+	vis.svg.transition().duration(750).call(vis.zoom.transform, d3.zoomIdentity);
 }
