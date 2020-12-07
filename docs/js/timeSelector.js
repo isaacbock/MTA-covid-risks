@@ -52,11 +52,12 @@ TimeSelector.prototype.initVis = function() {
         vis.updateVis();
     }); 
 
-    function updateTimeEachSecond(){
-        vis.updateVis("scheduled");
-        setTimeout(updateTimeEachSecond, 1000);
+    function updateTimeEachMinute(){
+        vis.updateVis();
+        let currentSeconds = new Date().getSeconds();
+        setTimeout(updateTimeEachMinute, (60 - currentSeconds) * 1000);
     }
-    updateTimeEachSecond();
+    updateTimeEachMinute();
 
     vis.stationsCheckbox.prop( "checked", vis.showStations );
     vis.linesCheckbox.prop( "checked", vis.showLines );
@@ -96,7 +97,7 @@ TimeSelector.prototype.wrangleData = function() {
  *  The drawing function
  */
 
-TimeSelector.prototype.updateVis = function(options) {
+TimeSelector.prototype.updateVis = function() {
     var vis = this;
 
     if (vis.displayingCurrentTime) {
@@ -117,9 +118,7 @@ TimeSelector.prototype.updateVis = function(options) {
         vis.sliderPosition = sliderPosition;
         let day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
         let hour = vis.sliderPosition%6;
-        if (options!="scheduled") {
-            changeCurrentTime(day, hour);
-        }
+        changeCurrentTime(day, hour);
     }
     else {
         let day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
@@ -127,9 +126,7 @@ TimeSelector.prototype.updateVis = function(options) {
         vis.nowButton.addClass("active");
         vis.currentDate.text(vis.daysOfWeek[day]);
         vis.currentTime.text(vis.hourBins[hour]);
-        if (options!="scheduled") {
-            changeCurrentTime(day, hour);
-        }
+        changeCurrentTime(day, hour);
     }
 
 }
