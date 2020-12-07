@@ -485,7 +485,6 @@ StationMap.prototype.selectStations = function (_stations) {
 	  station.selected = false;
     });
   }
-  console.log(vis.allStations.filter(d => d.selected))
 };
 
 /*
