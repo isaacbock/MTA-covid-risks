@@ -41,7 +41,35 @@ YearToDateUsageChart.prototype.initVis = function() {
 
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
-	
+
+	//zoom
+	vis.zoom = d3.zoom()
+    // Subsequently, you can listen to all zooming events
+    .on("zoom", function(event, d){
+		// Do something
+		var transform = event.transform;
+
+		//create new scale object based on event
+		var new_xScale = transform.rescaleX(vis.x);
+		vis.svg.select('.x-axis')
+   		.call(vis.xAxis.scale(new_xScale));
+		vis.area.x(d => new_xScale(d.time));
+
+		// Define the clipping region
+		vis.svg.append("defs").append("clipPath")
+		.attr("id", "clip")
+		.append("rect")
+		.attr("width", vis.width)
+		.attr("height", vis.height);
+
+		//And apply it to the path, brush and all other elements you want to clip
+		vis.timePath
+		.datum(vis.data)
+		.attr("d", vis.area)
+		.attr("clip-path", "url(#clip)");
+
+		vis.updateVis()
+    })
 	//Tool tip
 	vis.tip = d3.tip().attr('class', 'd3-tip')
 	.direction('n')
