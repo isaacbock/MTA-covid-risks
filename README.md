@@ -13,6 +13,6 @@
 - [React.js](https://reactjs.org/)
 - [Bootstrap](https://getbootstrap.com/)
 - [Turf.js](https://turfjs.org/) (used to map station geographical coordinates to local zip codes)
-- [Moment.js](https://momentjs.com/) (used to process data timezone data)
+- [Moment.js](https://momentjs.com/) (used to process data timezones)
 
 All other data and reference sources cited within our [Process Book](https://washuvis.github.io/nyccovid/processBook.html).
