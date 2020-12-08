@@ -31,17 +31,17 @@
 				<div class="horizontal">
 					<div>
 						<h3>Pick a Time</h3><hr>
-						<img src="images/TimeSlider.gif" width="200" height="133">
+						<img src="images/TimeSlider.gif" alt="Time Slider" width="200" height="133">
 					</div>
 					<div>
 						<h3>Plan Your Route</h3><hr>
-						<img src="images/StationMap.gif" width="200" height="133">
+						<img src="images/StationMap.gif" alt="Station Map" width="200" height="133">
 					</div>
 				</div>
 				<div>
 					<h3>Minimize Your Risk</h3><hr>
-					<img src="images/StationUsage.gif" width="300" height="150">
-					<img src="images/CovidRisk.gif" width="300" height="150">
+					<img src="images/StationUsage.gif" alt="Station Usage" width="300" height="150">
+					<img src="images/CovidRisk.gif" alt="COVID-19 Risk" width="300" height="150">
 				</div>
 			</div>
 			<button id="start-button">Loading...</button>
@@ -88,13 +88,10 @@
 			<div class="legend-axis"><p>0%</p><p>1.5%</p><p>3%</p><p>4.5%</p><p>6%</p><p>7.5%</p></div>
 		</div>
 		<div id="as-of">
-			<h5><a href="http://web.mta.info/developers/turnstile.html">MTA usage</a> as of <span id="metro-as-of"></span>.</h4>
-			<h5><a href="https://github.com/nychealth/coronavirus-data/blob/master/trends/percentpositive-by-modzcta.csv">COVID-19 rates</a> as of <span id="covid-as-of"></span>.</h4>
+			<h5><a href="http://web.mta.info/developers/turnstile.html">MTA usage</a> as of <span id="metro-as-of"></span>.</h5>
+			<h5><a href="https://github.com/nychealth/coronavirus-data/blob/master/trends/percentpositive-by-modzcta.csv">COVID-19 rates</a> as of <span id="covid-as-of"></span>.</h5>
+			<hr><h5>COVID-19 risk estimates assume a 5:1 ascertianment bias as per <a href="https://www.nature.com/articles/s41562-020-01000-9/">Nature Human Behavior</a>.</h5>
 		</div>
-	</div>
-		
-	
-		
 	</div>
 
 	<div id="detail-overlay">
@@ -128,8 +125,8 @@
 		</div>
 		<div id="annual-usage">
 			<h3>Subway Usage to Date</h3>
-			<div>
-				<button id="zoom-out-button" class="selected">Zoom Out</button>
+			<div id="zoom-controls">
+				<button id="zoom-out-button" class="active">Reset Zoom</button>
 			</div>
 			<div id="year-to-date-usage"></div>
 			<div id="area-tooltip"></div>
@@ -142,10 +139,12 @@
 	<script src="js/lib/d3.v6.min.js"></script>
 	<script src="js/lib/leaflet.js"></script>
 	<script src="js/lib/d3-tip/index.js"></script>
-	<!-- React Libs -->
-	<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-	  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-	  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+	<!-- React libraries -->
+	<script src="js/lib/react.development.js"></script>
+	<script src="js/lib/react-dom.development.js"></script>
+	<script src="js/lib/babel.min.js"></script>
+
 	<!-- Utility libraries -->
 	<script src="js/dateTimeUtils.js"></script>
 	<script src="js/lib/turf.min.js"></script>
@@ -161,7 +160,7 @@
 	<script src="js/covidRisk.js"></script>
 	<script src="js/dailyUsageChart.js"></script>
 	<script src="js/weeklyUsageChart.js"></script>
-	<script src="js/yearToDateUsageChart.js" type="application/javascript"></script>
+	<script src="js/yearToDateUsageChart.js"></script>
 	<script src="js/stationSuggestions.js"></script>
 
 	<!-- Load data, create visualizations -->

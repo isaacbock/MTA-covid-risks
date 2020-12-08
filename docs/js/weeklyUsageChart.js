@@ -56,7 +56,7 @@ WeeklyUsageChart.prototype.initVis = function() {
 	})
 	.style('z-index', 99999)
 	.html(function(event, data){
-		return data;
+		return data + " passengers";
 	})
 	
 	vis.svg.call(vis.tip);

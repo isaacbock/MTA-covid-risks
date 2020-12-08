@@ -32,6 +32,7 @@ h5 {
   margin: 0;
   padding: 0;
   letter-spacing: 0.5px;
+  max-width: 220px;
 }
 p {
   margin: 0;
@@ -227,19 +228,19 @@ input[type="range"] {
   margin-top: 5px;
   margin-bottom: 15px;
 }
-#reset-buttons > button {
+#reset-buttons > button, #zoom-controls > button {
   display: inline-block;
   cursor: default;
   padding: 3px 10px 3px 10px;
   border: 2px solid transparent;
 }
-#reset-buttons > button.active {
+#reset-buttons > button.active, #zoom-controls > button.active {
   border: 2px solid #1e90ff;
   color: #1e90ff;
   /* transition: 500ms; */
   cursor: pointer;
 }
-#reset-buttons > button.active:hover {
+#reset-buttons > button.active:hover, #zoom-controls > button.active:hover {
   color: white;
   background-color: #1e90ff;
   transition: 500ms;
@@ -269,6 +270,12 @@ input[type="range"] {
 #as-of {
   margin-top: 10px;
   margin-left: 5px;
+}
+#as-of > hr {
+	margin-top: 5px;
+	margin-bottom: 2px;
+	width: 220px;
+	border: 1px solid transparent;
 }
 
 #detail-overlay {
@@ -311,12 +318,11 @@ input[type="range"] {
   flex-direction: column;
   align-items: center;
 }
-#station-usage,
-#covid-risk {
+#station-usage, #covid-risk {
   min-height: 250px;
 }
 #annual-usage {
-  min-height: 250px;
+  min-height: 240px;
 }
 #area-tooltip {
   font-size:13px;

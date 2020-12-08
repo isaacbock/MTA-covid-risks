@@ -112,6 +112,9 @@ CovidRisk.prototype.wrangleData = function(_selectedStations) {
                     let zipCode = region.properties.MODZCTA;
                     let lookupKey = "PCTPOS_" + zipCode;
                     let covidRate = vis.covidData[lookupKey];
+                    if (zipCode==99999) {
+                        covidRate = 0;
+                    }
                     vis.percentPositive += parseFloat(covidRate);
                     stationCount++;
                 }
@@ -259,7 +262,7 @@ CovidRisk.prototype.changeCrowdSize = function() {
     else if ($(vis.buttons[2]).hasClass("selected")) {
         crowdSize = 50;
     }
-    // Add in 5% ascertainment bias per Georgia Tech computations
+    // Add in 5:1 ascertainment bias per Georgia Tech computations
     let percentPositiveWithAscertainment = vis.percentPositive * 5;
     // Calculate COVID-19 risk via Geogia Tech computations
     let probRandomlySelectedPerson = percentPositiveWithAscertainment/100*crowdSize/100;
