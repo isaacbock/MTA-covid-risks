@@ -1,5 +1,5 @@
 /*
- *  StationMap - Object constructor function
+ *  WeeklyUsageChart - Object constructor function
  *  @param _parentElement   -- HTML element in which to draw the visualization
  *  @param _metroData       -- Hourly metro data for most recent week
  */
