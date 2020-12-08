@@ -37,3 +37,19 @@ img.small {
     width: 50%;
     height: auto;
 }
+img.narrow {
+    width: 25%;
+    height: auto;
+}
+.checkmark {
+	position: relative;
+	list-style: none;
+	margin-left: 0;
+	padding-left: 2.5em;
+}
+.checkmark li:before {
+	content: "✔";
+	position: absolute;
+    left: 1.0em;
+    bottom: 5;
+}

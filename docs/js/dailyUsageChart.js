@@ -42,12 +42,18 @@ DailyUsageChart.prototype.initVis = function() {
        	.append("g")
 		.attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")")
 	
-	// Initialize Scales and Axex
+	// Initialize Scales and Axes
 	vis.heightScale = d3.scaleLinear().range([vis.height, 0]);
 	vis.xScale = d3.scaleLinear().range([0, vis.width]);
 
 	vis.xAxis = d3.axisBottom().tickFormat(d => vis.conciseHourBlocks[d]).ticks(6).tickSize(0);
-	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
+    vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
+    
+    vis.xAxisGroup = vis.svg.append("g")
+		.attr("class", "x-axis axis")
+		.attr("transform", "translate(0, 70)");
+	vis.yAxisGroup = vis.svg.append("g")
+		.attr("class", "y-axis axis");
 
 	//Tool tip
 	vis.tip = d3.tip().attr('class', 'd3-tip')
@@ -162,7 +168,7 @@ DailyUsageChart.prototype.updateVis = function() {
 		}
     })
     .transition()
-	.duration(500)
+	.duration(750)
 	.attr("height", d => vis.height - vis.heightScale(d))
 	.attr("y", d => {
 		return vis.heightScale(d);
@@ -171,22 +177,17 @@ DailyUsageChart.prototype.updateVis = function() {
 	//exit
 	selection.exit().remove();
 
-	//TODO draw axis and labels
-	vis.svg.selectAll(".y-axis").remove();
-	vis.svg.selectAll(".x-axis").remove();
-
-	vis.svg.append("g")
-	.attr("class", "axis y-axis")
-	.attr("transform", "translate(0, 0)")
-	.call(vis.yAxis)
-
-	vis.svg.append("g")
-	.attr("class", "axis x-axis")
-	.attr("transform", "translate(0, 70)")
-	.call(vis.xAxis)
-
 	vis.svg.selectAll(".x-axis text")
-	.attr("transform", "translate(30, 5)")
+        .attr("transform", "translate(30, 5)")
+    
+	vis.svg.select(".y-axis")
+		.transition()
+		.duration(750)
+		.call(vis.yAxis);
+	vis.svg.select(".x-axis")
+		.transition()
+		.duration(750)
+        .call(vis.xAxis);
 }
 
 DailyUsageChart.prototype.changeSelectedStations = function(stations){
