@@ -144,7 +144,7 @@ function createVis() {
   yearToDateUsageChart = new YearToDateUsageChart(
     "year-to-date-usage",
     metroDataDaily,
-    "2020-12-05 EST"
+    "2020-12-10"
   );
   covidRisk = new CovidRisk(
     "covid-risk",
