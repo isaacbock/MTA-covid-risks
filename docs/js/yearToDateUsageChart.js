@@ -44,6 +44,12 @@ YearToDateUsageChart.prototype.initVis = function() {
 	vis.xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%m-%d")).ticks(7);
 	vis.yAxis = d3.axisLeft().ticks(4).tickFormat(d3.formatPrefix(".1", 1e3));
 
+	vis.xAxisGroup = vis.svg.append("g")
+		.attr("class", "x-axis axis")
+		.attr("transform", "translate(0, "+vis.height+")")
+	vis.yAxisGroup = vis.svg.append("g")
+		.attr("class", "y-axis axis");
+
 	//zoom
 
 	vis.zoom = d3.zoom()
@@ -62,7 +68,7 @@ YearToDateUsageChart.prototype.initVis = function() {
 		vis.area.x(d => new_xScale(d.date));
 		
 		//And apply it to the path, brush and all other elements you want to clip
-		vis.updateVis()
+		vis.updateVis(true);
 	})
 	.scaleExtent([1,10])
 
@@ -192,8 +198,13 @@ YearToDateUsageChart.prototype.wrangleData = function() {
 
 }
 
-YearToDateUsageChart.prototype.updateVis = function() {
+YearToDateUsageChart.prototype.updateVis = function(zoom) {
 	vis = this;
+
+	let transitionDuration = 750;
+	if (zoom!=undefined && zoom) {
+		transitionDuration = 0;
+	}
 
 	// Call zoom component here
 	vis.svg.call(vis.zoom)
@@ -229,28 +240,23 @@ YearToDateUsageChart.prototype.updateVis = function() {
 	vis.path
 	.datum(vis.aggregatedDataArray)
 	.transition()
+	.duration(transitionDuration)
 	.attr("d", vis.area)
 	.style("fill", d=>{
 		return "url(#svgGradient)";
 	});
 
-	//TODO draw axis and labels
-	vis.svg.selectAll(".y-axis").remove();
-	vis.svg.selectAll(".x-axis").remove();
-
-	vis.svg.append("g")
-	.attr("class", "axis y-axis")
-	.attr("transform", "translate(0, 0)")
-	.call(vis.yAxis)
-
-	vis.svg.append("g")
-	.attr("class", "axis x-axis")
-	.attr("transform", "translate(0, "+vis.height+")")
-	.call(vis.xAxis)
-
+	//update axes and labels
+	vis.svg.select(".y-axis")
+		.transition()
+		.duration(750)
+		.call(vis.yAxis);
+	vis.svg.select(".x-axis")
+		.call(vis.xAxis);
 	vis.svg.selectAll(".x-axis text")
-	.attr("text-anchor", "end")
-	.attr("transform", "rotate(-45)")
+		.attr("text-anchor", "end")
+		.attr("transform", "rotate(-45)")
+	
 }
 
 YearToDateUsageChart.prototype.changeSelectedStations = function(stations){

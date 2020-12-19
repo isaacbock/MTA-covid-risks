@@ -141,10 +141,13 @@ function createVis() {
   );
   dailyUsageChart = new DailyUsageChart("daily-usage", metroDataHourly);
   weeklyUsageChart = new WeeklyUsageChart("weekly-usage", metroDataHourly);
+  let latestDate = moment(metroDataDaily[metroDataDaily.length - 1].date).format(
+    "YYYY-MM-DD"
+  );
   yearToDateUsageChart = new YearToDateUsageChart(
     "year-to-date-usage",
     metroDataDaily,
-    "2020-12-10"
+    latestDate
   );
   covidRisk = new CovidRisk(
     "covid-risk",

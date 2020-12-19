@@ -84,8 +84,8 @@ WeeklyUsageChart.prototype.wrangleData = function(currentDay) {
     // aggregate daily counts into one array
 	vis.aggregateCounts = [0,0,0,0,0,0,0];
     vis.filteredData.forEach(d => {
-		vis.aggregateCounts[new Date(d.date).getDay()] += d["tot"];
-    });
+		vis.aggregateCounts[moment.tz(d.date,"YYYY-MM-DD", "America/New_York").day()] += d["tot"];
+	});
 
     vis.heightScale.domain([
 		0,
