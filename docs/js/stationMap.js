@@ -117,14 +117,12 @@ StationMap.prototype.initVis = function () {
     11
   );
   L.tileLayer(
-    "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}",
+    "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     {
       attribution:
-        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      subdomains: "abcd",
+        'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
       minZoom: 11,
       maxZoom: 16,
-      ext: "png",
     }
   ).addTo(vis.map);
 
@@ -249,41 +247,13 @@ StationMap.prototype.createVis = function () {
 
   // Scale markers on zoom, adapted from https://stackoverflow.com/a/46016693
   vis.map.on("zoomend", () => {
-    if (vis.map.getZoom() > 15) {
-      $("#station-map .station-marker").css({
-        width: 40,
-        height: 40,
-        "margin-left": -20,
-        "margin-top": -20,
-      });
-    } else if (vis.map.getZoom() > 14) {
-      $("#station-map .station-marker").css({
-        width: 30,
-        height: 30,
-        "margin-left": -15,
-        "margin-top": -15,
-      });
-    } else if (vis.map.getZoom() > 11) {
-      $("#station-map .station-marker").css({
-        width: 16,
-        height: 16,
-        "margin-left": -8,
-        "margin-top": -8,
-      });
-    } else {
-      $("#station-map .station-marker").css({
-        width: 10,
-        height: 10,
-        "margin-left": -5,
-        "margin-top": -5,
-      });
-    }
+    vis.scaleMarkers(vis.map);
   });
 
   // Add zip code overlays
   L.geoJson(vis.neighborhoodData, {
     style: styleZipCode,
-    weight: 2,
+    weight: .5,
     pane: "COVID",
   }).addTo(vis.map);
   // Color zip codes by covid rates
@@ -422,7 +392,7 @@ StationMap.prototype.updateVis = function () {
         vis.weekdaysFull[vis.currentDay];
       marker.setTooltipContent(popupContent);
     });
-
+    vis.scaleMarkers(vis.map);
     vis.selectStations(vis.selectedStations);
   }
 };
@@ -522,3 +492,37 @@ StationMap.prototype.refresh = function (
 
   this.wrangleData(0, 0, "create");
 };
+
+StationMap.prototype.scaleMarkers = function(map) {
+  if (map!=undefined) {
+    if (map.getZoom() > 15) {
+      $("#station-map .station-marker").css({
+        width: 40,
+        height: 40,
+        "margin-left": -20,
+        "margin-top": -20,
+      });
+    } else if (map.getZoom() > 14) {
+      $("#station-map .station-marker").css({
+        width: 30,
+        height: 30,
+        "margin-left": -15,
+        "margin-top": -15,
+      });
+    } else if (map.getZoom() > 11) {
+      $("#station-map .station-marker").css({
+        width: 16,
+        height: 16,
+        "margin-left": -8,
+        "margin-top": -8,
+      });
+    } else {
+      $("#station-map .station-marker").css({
+        width: 10,
+        height: 10,
+        "margin-left": -5,
+        "margin-top": -5,
+      });
+    }
+  }
+}

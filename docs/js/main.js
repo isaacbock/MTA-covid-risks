@@ -27,7 +27,7 @@ stationMap = new StationMap(
   [],
   [],
   [],
-  [40.73, -73.8],
+  [40.74, -73.8],
   [showStations, showLines, showCOVID]
 );
 
