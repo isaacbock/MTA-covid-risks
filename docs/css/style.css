@@ -181,10 +181,10 @@ hr {
   box-shadow: 0px 0px 10px black;
 }
 .station-marker.unselected > div {
-	filter: brightness(.5);
+	filter: brightness(.4);
 }
 .station-marker.unselected.mouseover > div {
-	filter: brightness(.8);
+	filter: brightness(.6);
 }
 .leaflet-tile {
   -webkit-filter: hue-rotate(180deg) invert(90%);

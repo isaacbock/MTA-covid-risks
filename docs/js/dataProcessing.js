@@ -18,14 +18,15 @@ function updateData() {
         // 200905, 200912, 200919, 200926, 
         // 201003, 201010, 201017, 201024, 201031, 
         // 201107, 201114, 201121, 201128,
-        201205, 201212, 201219
+        201205, 201212, 201219, 201226
     ];
 
     // defaults
-    let baseURL = "https://cors-anywhere.herokuapp.com/http://web.mta.info/developers/data/nyct/turnstile/turnstile_";
+    // let baseURL = "https://cors-anywhere.herokuapp.com/http://web.mta.info/developers/data/nyct/turnstile/turnstile_";
+    let baseURL = "http://web.mta.info/developers/data/nyct/turnstile/turnstile_";
     moment.tz.setDefault("America/New_York");
 
-    // initiailize data structures
+    // initialize data structures
     let remoteComplexLookup = [];
     let stationLookup = [];
     let rawData = [];
