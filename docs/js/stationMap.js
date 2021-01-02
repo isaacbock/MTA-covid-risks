@@ -43,6 +43,8 @@ StationMap = function (
 StationMap.prototype.initVis = function () {
   var vis = this;
 
+  vis.noneSelected = true;
+
   vis.stationColorScale = d3
     .scaleLinear()
     .domain([0, 250, 500])
@@ -444,23 +446,27 @@ StationMap.prototype.selectStations = function (_stations) {
   vis.selectedStations = _stations;
   // if some stations are selected, the rest should be somewhat desaturated for contrast
   if (vis.selectedStations.length != 0) {
+    vis.noneSelected = false;
     vis.allStations.forEach((station) => {
       if (vis.selectedStations.some(d => d.id === station.id)) {
-		$(station._icon).removeClass("unselected");
-		station.selected = true;
+        $(station._icon).removeClass("unselected");
+        station.selected = true;
       } else {
-		$(station._icon).addClass("unselected");
-		station.selected = false;
+        $(station._icon).addClass("unselected");
+        station.selected = false;
       }
     });
   }
   // else if no stations are selected, all should be displayed in full color
   else {
+    vis.noneSelected = true;
     vis.allStations.forEach((station) => {
 	  $(station._icon).removeClass("unselected");
 	  station.selected = false;
     });
   }
+
+  vis.scaleMarkers(vis.map);
 };
 
 /*
@@ -500,9 +506,10 @@ StationMap.prototype.refresh = function (
 };
 
 StationMap.prototype.scaleMarkers = function(map) {
+  var vis = this;
   if (map!=undefined) {
     if (map.getZoom() > 15) {
-      $("#station-map .station-marker").css({
+      $("#station-map.station-marker").css({
         width: 40,
         height: 40,
         "margin-left": -20,
@@ -515,7 +522,7 @@ StationMap.prototype.scaleMarkers = function(map) {
         "margin-left": -15,
         "margin-top": -15,
       });
-    } else if (map.getZoom() > 11) {
+     } else if (map.getZoom() > 11) {
       $("#station-map .station-marker").css({
         width: 16,
         height: 16,
@@ -529,6 +536,38 @@ StationMap.prototype.scaleMarkers = function(map) {
         "margin-left": -5,
         "margin-top": -5,
       });
+    }
+    // increase size of selected stations
+    if (!vis.noneSelected) {
+      if (map.getZoom() > 15) {
+        $("#station-map .station-marker:not(.unselected)").css({
+          width: 60,
+          height: 60,
+          "margin-left": -30,
+          "margin-top": -30,
+        });
+      } else if (map.getZoom() > 14) {
+        $("#station-map .station-marker:not(.unselected)").css({
+          width: 45,
+          height: 45,
+          "margin-left": -22.5,
+          "margin-top": -22.5,
+        });
+      } else if (map.getZoom() > 11) {
+        $("#station-map .station-marker:not(.unselected)").css({
+          width: 24,
+          height: 24,
+          "margin-left": -12,
+          "margin-top": -12,
+        });
+      } else {
+        $("#station-map .station-marker:not(.unselected)").css({
+          width: 15,
+          height: 15,
+          "margin-left": -7.5,
+          "margin-top": -7.5,
+        });
+      }
     }
   }
 }
