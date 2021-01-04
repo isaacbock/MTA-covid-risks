@@ -228,8 +228,11 @@ function selectStations(stations) {
 function changeCurrentTime(day, hour) {
   stationMap.wrangleData(day, hour);
   dailyUsageChart.wrangleData(day, hour);
-  weeklyUsageChart.wrangleData(day);
+  weeklyUsageChart.wrangleData(day, hour);
   stationSuggestions.wrangleData(day, hour);
+  if (timeSelector != undefined) {
+    timeSelector.updateTime(day, hour);
+  }
 }
 
 function highlightStations(stations) {

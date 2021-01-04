@@ -137,6 +137,7 @@ DailyUsageChart.prototype.updateVis = function() {
 	//constants for styling
 	const color = "darkgrey";
 	const highlight = "#505050"
+	const index = d3.local();
 
 	// enter
 	selection.enter().append("rect")
@@ -154,8 +155,16 @@ DailyUsageChart.prototype.updateVis = function() {
 	.attr("y", d => {
 		return vis.heightScale(d);
 	})
+	.each(function(d, i) {
+		// Store element indices via https://stackoverflow.com/a/64914497
+		index.set(this, i);
+	})
 	.on('mouseover', vis.tip.show)
-	.on('mouseout', vis.tip.hide);
+	.on('mouseout', vis.tip.hide)
+	.on('click', function(e) {
+		let newHour = index.get(this);
+		changeCurrentTime(vis.currentDay, newHour);
+	});
 
 	//update
 	selection

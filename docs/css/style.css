@@ -337,6 +337,9 @@ input[type="range"] {
 #station-map > h3 {
   font-size: 25px;
 }
+#daily-usage > svg > g > rect, #weekly-usage > svg > g > rect {
+  cursor: pointer;
+}
 #covid-columns {
   width: 100%;
   display: flex;

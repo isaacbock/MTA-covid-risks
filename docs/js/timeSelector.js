@@ -38,6 +38,9 @@ TimeSelector.prototype.initVis = function() {
 
     vis.slider = document.getElementById("time-slider");
     vis.sliderPosition = 0;
+    vis.day = 0;
+    vis.hour = 0;
+
     vis.slider.oninput = function() {
         if (this.value != vis.sliderPosition) {
             vis.displayingCurrentTime = false;
@@ -116,17 +119,31 @@ TimeSelector.prototype.updateVis = function() {
         else if (vis.time.hour() < 24)   { sliderPosition += 5 }
         vis.slider.value = sliderPosition;
         vis.sliderPosition = sliderPosition;
-        let day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
-        let hour = vis.sliderPosition%6;
-        changeCurrentTime(day, hour);
+        vis.day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
+        vis.hour = vis.sliderPosition%6;
+        changeCurrentTime(vis.day, vis.hour);
     }
     else {
-        let day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
-        let hour = vis.sliderPosition%6;
+        vis.day = (vis.sliderPosition - (vis.sliderPosition%6))/6;
+        vis.hour = vis.sliderPosition%6;
         vis.nowButton.addClass("active");
-        vis.currentDate.text(vis.daysOfWeek[day]);
-        vis.currentTime.text(vis.hourBins[hour]);
-        changeCurrentTime(day, hour);
+        vis.currentDate.text(vis.daysOfWeek[vis.day]);
+        vis.currentTime.text(vis.hourBins[vis.hour]);
+        changeCurrentTime(vis.day, vis.hour);
     }
 
+}
+
+/*
+ *  Receive external time updates
+ */
+
+TimeSelector.prototype.updateTime = function(day, hour) {
+    var vis = this;
+    if (vis.day!=day || vis.hour!=hour) {
+        vis.displayingCurrentTime = false;
+        vis.slider.value = 6*day + hour;
+        vis.sliderPosition = 6*day + hour;
+        vis.updateVis();
+    }
 }

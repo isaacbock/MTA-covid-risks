@@ -64,11 +64,12 @@ WeeklyUsageChart.prototype.initVis = function() {
 	vis.wrangleData();
 }
 
-WeeklyUsageChart.prototype.wrangleData = function(currentDay) {
+WeeklyUsageChart.prototype.wrangleData = function(currentDay, currentHour) {
     var vis = this;
     
-    if (currentDay != undefined) {
-        vis.currentDay = currentDay;
+    if (currentDay != undefined && currentHour != undefined) {
+		vis.currentDay = currentDay;
+		vis.currentHour = currentHour;
 	}
 
     //filter data to selected stations
@@ -111,6 +112,7 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	//constants for styling
 	const color = "darkgrey";
 	const highlight = "#505050"
+	const index = d3.local();
 
 	// enter
 	selection.enter().append("rect")
@@ -128,8 +130,16 @@ WeeklyUsageChart.prototype.updateVis = function() {
 	.attr("y", d => {
 		return vis.heightScale(d);
 	})
+	.each(function(d, i) {
+		// Store element indices via https://stackoverflow.com/a/64914497
+		index.set(this, i);
+	})
 	.on('mouseover', vis.tip.show)
-	.on('mouseout', vis.tip.hide);
+	.on('mouseout', vis.tip.hide)
+	.on('click', function(e) {
+		let newDay = index.get(this);
+		changeCurrentTime(newDay, vis.currentHour);
+	});
 
 	//update
 	selection
