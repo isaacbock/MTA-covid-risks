@@ -40,11 +40,11 @@ StationSuggestions.prototype.wrangleData = function(currentDay, currentHourBlock
     if (currentDay != undefined && currentHourBlock != undefined) {
         vis.currentDay = currentDay;
 		vis.currentHourBlock = currentHourBlock;
-	}
+    }
 
     // if no stations selected, no recommendations can be made
 	if (vis.selectedStations == undefined || vis.selectedStations.length == 0) {
-        vis.stationSuggestions = "";
+        $("#station-suggestions").empty();
     }
     // else, determine which zip codes the selected stations are in (via Turf.js) and use only this data
     else {
@@ -67,11 +67,13 @@ StationSuggestions.prototype.wrangleData = function(currentDay, currentHourBlock
                         vis.nearbyStations.push({
                             station: station.name, 
                             latitude: station.lat, 
-                            longitude: station.long, 
+                            longitude: station.long,
+                            id: station.id, 
                             distance: distance,
                             originalStation: selectedStation.name,
                             originalLatitude: selectedStation.latitude,
-                            originalLongitude: selectedStation.longitude
+                            originalLongitude: selectedStation.longitude,
+                            originalID: selectedStation.id
                         });
                     }
                     // else, station already exists: do not create new nearby station, and instead only update its data if this instance is closer
@@ -105,31 +107,45 @@ StationSuggestions.prototype.wrangleData = function(currentDay, currentHourBlock
         vis.nearbyStations.sort((a, b) => (a.distance > b.distance) ? 1 : -1);
 
         // recommend safer stations
-        vis.stationSuggestions = "";
+        $("#station-suggestions").empty();
         vis.nearbyStations.forEach(nearbyStation => {
             let originalStation = vis.selectedStations.find(d => {
                 return d.name==nearbyStation.originalStation && d.latitude==nearbyStation.originalLatitude && d.longitude==nearbyStation.originalLongitude;
             });
             if (nearbyStation.trafficCount < originalStation.trafficCount) {
-                vis.stationSuggestions += "ℹ " + nearbyStation.station + " (" + nearbyStation.distance.toFixed(2) + " mi away) has " + (100-(nearbyStation.trafficCount/originalStation.trafficCount*100).toFixed(0)) + "% less traffic. <br>";
+                let content = "ℹ " + nearbyStation.station + " (" + nearbyStation.distance.toFixed(2) + " mi away) has " + (100-(nearbyStation.trafficCount/originalStation.trafficCount*100).toFixed(0)) + "% less traffic.";
+                let data = {
+                    id: nearbyStation.id,
+                    latitude: nearbyStation.latitude,
+                    longitude: nearbyStation.longitude,
+                    name: nearbyStation.station,
+                    trafficCount: nearbyStation.trafficCount
+                };
+                let recommendation = $("<p></p>").text(content).data("data", data).data("originalStationID", originalStation.id).hover(
+                    function() {
+                        let thisStation = $(this);
+                        let clickToReplace = $("<span></span>").text("(Click to Replace)").attr("id", "clickToReplace");
+                        recommendation.append(clickToReplace);
+                        $("#station-suggestions > p").addClass("unselected");
+                        thisStation.removeClass("unselected");
+                        let alternativeStation = thisStation.data("data");
+                        vis.alternativeSelection = vis.selectedStations.map(function(station) { 
+                            return station.id == thisStation.data("originalStationID") ? alternativeStation : station; 
+                        });
+                        highlightStations(vis.alternativeSelection);
+
+                    }, function() {
+                        $("#station-suggestions > p").removeClass("unselected");
+                        $("#clickToReplace").remove();
+                        highlightStations(vis.selectedStations);
+                    }
+                ).click(function() {
+                    selectStations(vis.alternativeSelection);
+                });
+                $("#station-suggestions").append(recommendation);
             }
         });
     }
-
-	// Update the visualization
-	vis.updateVis();
-}
-
-
-/*
- *  The drawing function
- */
-
-StationSuggestions.prototype.updateVis = function() {
-    var vis = this;
-    
-    $("#station-suggestions").html(vis.stationSuggestions);
-
 }
 
 StationSuggestions.prototype.changeSelectedStations = function(stations){

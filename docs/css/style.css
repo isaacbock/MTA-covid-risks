@@ -367,6 +367,21 @@ input[type="range"] {
   margin-top: 15px;
   margin-bottom: 20px;
 }
+#station-suggestions > p:hover {
+  cursor: pointer;
+}
+#station-suggestions > p.unselected {
+  color:rgba(255, 255, 255, 0.5)
+}
+#clickToReplace {
+  text-transform: uppercase;
+  font-size: 10px;
+  font-style: italic;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 1px;
+  margin-left: 5px;
+}
 .d3-tip {
   line-height: 1;
   font-weight: bold;

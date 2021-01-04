@@ -192,6 +192,7 @@ function toggleLayers(stations, lines, covid) {
 }
 
 function selectStations(stations) {
+
   if (stations == undefined || stations.length == 0) {
     $("#clear-button").removeClass("active");
   } else {
@@ -229,6 +230,10 @@ function changeCurrentTime(day, hour) {
   dailyUsageChart.wrangleData(day, hour);
   weeklyUsageChart.wrangleData(day);
   stationSuggestions.wrangleData(day, hour);
+}
+
+function highlightStations(stations) {
+  stationMap.selectStations(stations);
 }
 
 const toggleStation = (s) => {
