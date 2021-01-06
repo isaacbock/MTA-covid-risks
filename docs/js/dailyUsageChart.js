@@ -73,7 +73,7 @@ DailyUsageChart.prototype.initVis = function() {
 
 DailyUsageChart.prototype.wrangleData = function(currentDay, currentHourBlock) {
     var vis = this;
-    
+	
     if (currentDay != undefined && currentHourBlock != undefined) {
         vis.currentDay = currentDay;
 		vis.currentHourBlock = currentHourBlock;
@@ -117,7 +117,7 @@ DailyUsageChart.prototype.wrangleData = function(currentDay, currentHourBlock) {
 }
 
 DailyUsageChart.prototype.updateVis = function() {
-    vis = this;
+	var vis = this;
 
     let totalCount = vis.aggregateCounts[vis.currentHourBlock] / (vis.selectedStations.length==0 ? 425:vis.selectedStations.length);
     let hourlyCount = totalCount/4;

@@ -105,7 +105,7 @@ WeeklyUsageChart.prototype.wrangleData = function(currentDay, currentHour) {
 }
 
 WeeklyUsageChart.prototype.updateVis = function() {
-    vis = this;
+    var vis = this;
 
 	var selection = vis.svg.selectAll("rect").data(vis.aggregateCounts);
 
