@@ -4,7 +4,7 @@
  *  @param _metroData		-- Array with all metro stations of the MTA
  *  @param _daysOfWeek		-- Most recent seven days and their corresponding days of the week (as ints)
  *  @param _covidData  		-- Array with all zip code COVID-19 rates
- *  @param _neightborhoodData  	-- Neighborhood geoJSON features
+ *  @param _neighborhoodData  	-- Neighborhood geoJSON features
  *  @param _lineData  		-- Line geoJSON features
  *  @param _mapPosition   	-- Geographic center of NYC
  * 	@param _defaultOptions  -- Array of default display options
@@ -475,7 +475,7 @@ StationMap.prototype.selectStations = function (_stations) {
  *  @param _metroData		-- Array with all metro stations of the MTA
  *  @param _daysOfWeek		-- Most recent seven days and their corresponding days of the week
  *  @param _covidData  		-- Array with all zip code COVID-19 rates
- *  @param _neightborhoodData  	-- Neighborhood geoJSON features
+ *  @param _neighborhoodData  	-- Neighborhood geoJSON features
  *  @param _lineData  		-- Line geoJSON features
  *  @param _mapPosition   	-- Geographic center of NYC
  * 	@param _defaultOptions  -- Array of default display options

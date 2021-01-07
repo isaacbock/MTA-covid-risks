@@ -4,7 +4,7 @@
  *  @param _parentElement       -- HTML element in which to draw the broad visualization
  *  @param _svgElement          -- HTML element in which to draw the SVG visualization
  *  @param _covidData  		    -- Array with all zip code COVID-19 rates
- *  @param _neightborhoodData  	-- Neighborhood geoJSON features
+ *  @param _neighborhoodData  	-- Neighborhood geoJSON features
  */
 
 CovidRisk = function(_parentElement, _svgElement, _covidData, _neighborhoodData) {
@@ -264,7 +264,7 @@ CovidRisk.prototype.changeCrowdSize = function() {
     }
     // Add in 5:1 ascertainment bias per Georgia Tech computations
     let percentPositiveWithAscertainment = vis.percentPositive * 5;
-    // Calculate COVID-19 risk via Geogia Tech computations
+    // Calculate COVID-19 risk via Georgia Tech computations
     let probRandomlySelectedPerson = percentPositiveWithAscertainment/100*crowdSize/100;
     let probInfectionWithinCrowd = (1 - Math.pow(1-probRandomlySelectedPerson, crowdSize))*100;
     $("#crowd-risk-estimate").text((probInfectionWithinCrowd.toFixed(2)!="100.00" ? probInfectionWithinCrowd.toFixed(2) : "99.99") +"%");

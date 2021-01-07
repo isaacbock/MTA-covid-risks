@@ -31,7 +31,7 @@ stationMap = new StationMap(
   [showStations, showLines, showCOVID]
 );
 
-// Only show daily usage map, hide hourly usage map unti user clicks toggle buttons
+// Only show daily usage map, hide hourly usage map until user clicks toggle buttons
 $("#weekly-usage").hide();
 
 $("#weekly-button").click(function () {
@@ -108,7 +108,7 @@ function processData(
       record.station != "Exchange Pl"
   );
 
-  //all metro dates data for weekly usage chart, append timezone for correct date encoding / decoding
+  // all metro dates data for weekly usage chart, append timezone for correct date encoding / decoding
   self.metroDataDaily = self.metroDataDaily.map((d) => {
     d.date = d.date + " EST";
     return d;

@@ -79,7 +79,7 @@ DailyUsageChart.prototype.wrangleData = function(currentDay, currentHourBlock) {
 		vis.currentHourBlock = currentHourBlock;
 	}
 
-    //filter data to selected stations
+    // filter data to selected stations
     vis.filteredData = vis.metroData;
     if (vis.selectedStations.length != 0) {
         vis.filteredData = vis.metroData.filter(d => {
