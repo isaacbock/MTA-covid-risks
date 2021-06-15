@@ -1,0 +1,4 @@
+docs/**/* linguist-documentation=false
+docs/js/lib/* linguist-vendored=true
+docs/js/dateTimeUtils.js linguist-vendored=true
+docs/css/leaflet.css linguist-vendored=true
