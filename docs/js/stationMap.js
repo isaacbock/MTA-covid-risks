@@ -51,8 +51,11 @@ StationMap.prototype.initVis = function () {
     .range(["rgb(0,255,0)", "rgb(255, 255, 0)", "rgb(255, 0, 0)"]);
   vis.covidColorScale = d3
     .scaleLinear()
-    .domain([0, 12.5/2, 12.5])
-    .range(["white", "#001E82", "#000B2F"]);
+    .domain([0, 5/2, 5])
+    // moderate colors
+    .range(["white", "#6175ba", "#001E82"]);
+    // intense colors
+    // .range(["white", "#001E82", "#000B2F"]);
 
   let stationStartingColor = vis.stationColorScale(
     vis.stationColorScale.domain()[0]
