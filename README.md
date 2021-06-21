@@ -1,5 +1,5 @@
-# [NYC Metro Live COVID-19 Risks](https://washuvis.github.io/nyccovid/)
-![Final Project](https://washuvis.github.io/nyccovid/images/Milestone3.png "Final Project")
+# [NYC Metro Live COVID-19 Risks](https://isaacbock.github.io/MTA-covid-risks/)
+![Final Project](https://isaacbock.github.io/MTA-covid-risks/images/Milestone3.png "Final Project")
 
 ### Team Members
 - Isaac Bock — isaactbock@wustl.edu - 466249
@@ -14,4 +14,4 @@
 - [Turf.js](https://turfjs.org/) (used to map station geographical coordinates to local zip codes)
 - [Moment.js](https://momentjs.com/) (used to process data timezones)
 
-All other data and reference sources are cited within our [Process Book](https://washuvis.github.io/nyccovid/processBook.html).
+All other data and reference sources are cited within our [Process Book](https://isaacbock.github.io/MTA-covid-risks/processBook.html).
