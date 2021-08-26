@@ -1,183 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="">
-	<title>NYC Metro COVID-19 Risks</title>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="" />
+		<title>NYC Metro COVID-19 Risks</title>
 
-	<!-- Load Google Font -->
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+		<!-- Load Google Font -->
+		<link rel="preconnect" href="https://fonts.gstatic.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
 
-	<!-- Prevent Indexing -->
-	<meta name="robots" content="noindex">
+		<!-- Prevent Indexing -->
+		<meta name="robots" content="noindex" />
 
-	<!-- Metadata -->
-	<meta property="og:title" content="NYC Metro COVID-19 Risks">
-	<meta property="og:description" content="Interactive visualization of estimated hourly MTA traffic and local COVID-19 rates in NYC to promote safe and socially distant travel.">
-	<meta property="og:image" content="https://raw.githubusercontent.com/isaacbock/MTA-covid-risks/main/docs/images/promo.jpg">
-	<meta property="og:url" content="https://isaacbock.github.io/MTA-covid-risks/">
+		<!-- Metadata -->
+		<meta property="og:title" content="NYC Metro COVID-19 Risks" />
+		<meta
+			property="og:description"
+			content="Interactive visualization of estimated hourly MTA traffic and local COVID-19 rates in NYC to promote safe and socially distant travel."
+		/>
+		<meta
+			property="og:image"
+			content="https://raw.githubusercontent.com/isaacbock/MTA-covid-risks/main/docs/images/promo.jpg"
+		/>
+		<meta
+			property="og:url"
+			content="https://isaacbock.github.io/MTA-covid-risks/"
+		/>
 
-	<link rel="stylesheet" href="css/leaflet.css">
-	<link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script
+			async
+			src="https://www.googletagmanager.com/gtag/js?id=G-5K9JJPDEG4"
+		></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag("js", new Date());
+			gtag("config", "G-5K9JJPDEG4");
+		</script>
 
-	<div  id="header">
-		<h1>NYC Metro COVID-19 Risks</h1>
-		<div id="search-div"></div>
-		<a href="processBook.html">Process Book</a>
-		<a href="https://youtu.be/wyS1cVX_MOA">Demo</a>
-	</div>
+		<!-- Hotjar Tracking Code for https://isaacbock.github.io/ -->
+		<script>
+			(function (h, o, t, j, a, r) {
+				h.hj =
+					h.hj ||
+					function () {
+						(h.hj.q = h.hj.q || []).push(arguments);
+					};
+				h._hjSettings = { hjid: 2574054, hjsv: 6 };
+				a = o.getElementsByTagName("head")[0];
+				r = o.createElement("script");
+				r.async = 1;
+				r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+				a.appendChild(r);
+			})(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+		</script>
 
-	<div id="loading-screen">
-		<div id="loading-bubble">
+		<link rel="stylesheet" href="css/leaflet.css" />
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+	<body>
+		<div id="header">
 			<h1>NYC Metro COVID-19 Risks</h1>
-			<div id="instructions">
-				<div class="horizontal">
-					<div>
-						<h3>Pick a Time</h3><hr>
-						<img src="images/TimeSlider.gif" alt="Time Slider" width="200" height="133">
+			<div id="search-div"></div>
+			<a href="processBook.html">Process Book</a>
+			<a href="https://youtu.be/wyS1cVX_MOA">Demo</a>
+		</div>
+
+		<div id="loading-screen">
+			<div id="loading-bubble">
+				<h1>NYC Metro COVID-19 Risks</h1>
+				<div id="instructions">
+					<div class="horizontal">
+						<div>
+							<h3>Pick a Time</h3>
+							<hr />
+							<img
+								src="images/TimeSlider.gif"
+								alt="Time Slider"
+								width="200"
+								height="133"
+							/>
+						</div>
+						<div>
+							<h3>Plan Your Route</h3>
+							<hr />
+							<img
+								src="images/StationMap.gif"
+								alt="Station Map"
+								width="200"
+								height="133"
+							/>
+						</div>
 					</div>
 					<div>
-						<h3>Plan Your Route</h3><hr>
-						<img src="images/StationMap.gif" alt="Station Map" width="200" height="133">
+						<h3>Minimize Your Risk</h3>
+						<hr />
+						<img
+							src="images/StationUsage.gif"
+							alt="Station Usage"
+							width="300"
+							height="150"
+						/>
+						<img
+							src="images/CovidRisk.gif"
+							alt="COVID-19 Risk"
+							width="300"
+							height="150"
+						/>
 					</div>
+				</div>
+				<button id="start-button">Loading...</button>
+			</div>
+		</div>
+
+		<div id="station-map"></div>
+
+		<div id="time-overlay">
+			<h1 id="current-date"></h1>
+			<h2 id="current-time"></h2>
+			<form>
+				<input
+					type="range"
+					id="time-slider"
+					name="vol"
+					min="0"
+					max="41"
+					step="1"
+				/>
+			</form>
+			<div id="weekday-labels">
+				<p>S</p>
+				<p>M</p>
+				<p>T</p>
+				<p>W</p>
+				<p>Th</p>
+				<p>F</p>
+				<p>S</p>
+			</div>
+			<div id="reset-buttons">
+				<button id="now-button">Now</button>
+				<button id="clear-button">Clear Stations</button>
+			</div>
+			<div id="checkboxes">
+				<div>
+					<input type="checkbox" id="show-stations" name="Metro Stations" />
+					<label for="show-stations">Metro Stations</label>
 				</div>
 				<div>
-					<h3>Minimize Your Risk</h3><hr>
-					<img src="images/StationUsage.gif" alt="Station Usage" width="300" height="150">
-					<img src="images/CovidRisk.gif" alt="COVID-19 Risk" width="300" height="150">
+					<input type="checkbox" id="show-lines" name="Metro Lines" />
+					<label for="show-lines">Metro Lines</label>
+				</div>
+				<div>
+					<input type="checkbox" id="show-COVID-rates" name="COVID Rates" />
+					<label for="show-COVID-rates">COVID-19 Rates</label>
 				</div>
 			</div>
-			<button id="start-button">Loading...</button>
-		</div>
-	</div>
-
-	<div id="station-map"></div>
-
-	<div id="time-overlay">
-		<h1 id="current-date"></h1>
-		<h2 id="current-time"></h2>
-		<form>
-			<input type="range" id="time-slider" name="vol" min="0" max="41" step="1">
-		</form>
-		<div id="weekday-labels">
-			<p>S</p><p>M</p><p>T</p><p>W</p><p>Th</p><p>F</p><p>S</p>
-		</div>
-		<div id="reset-buttons">
-			<button id="now-button">Now</button>
-			<button id="clear-button">Clear Stations</button>
-		</div>
-		<div id="checkboxes">
-			<div>
-				<input type="checkbox" id="show-stations" name="Metro Stations">
-				<label for="show-stations">Metro Stations</label>
-			</div>
-			<div>
-				<input type="checkbox" id="show-lines" name="Metro Lines">
-				<label for="show-lines">Metro Lines</label>
-			</div>
-			<div>
-				<input type="checkbox" id="show-COVID-rates" name="COVID Rates">
-				<label for="show-COVID-rates">COVID-19 Rates</label>
-			</div>
-		</div>
-		<div class="legend">
-			<h4>Station Traffic</h4>
-			<div id="station-legend" class="legend-colors"></div>
-			<div class="legend-axis"><p>0/hr</p><p>250/hr</p><p>500+/hr</p></div>
-		</div>
-		<div class="legend">
-			<h4>COVID-19 Rates</h4>
-			<div id="covid-legend" class="legend-colors"></div>
-			<div class="legend-axis">
-				<p>0%</p>
-				<p>1%</p>
-				<p>2%</p>
-				<p>3%</p>
-				<p>4%</p>
-				<p>≥5%</p>
-			</div>
-		</div>
-		<div id="as-of">
-			<h5><a href="http://web.mta.info/developers/turnstile.html">MTA usage</a> as of <span id="metro-as-of"></span>.</h5>
-			<h5><a href="https://github.com/nychealth/coronavirus-data/blob/master/trends/percentpositive-by-modzcta.csv">COVID-19 rates</a> as of <span id="covid-as-of"></span>.</h5>
-			<hr><h5>COVID-19 risk estimates assume a 5:1 ascertainment bias as per <a href="https://www.nature.com/articles/s41562-020-01000-9/">Nature Human Behavior</a>.</h5>
-		</div>
-	</div>
-
-	<div id="detail-overlay">
-		<h2 id="current-stations">All Stations</h2>
-		<div id="station-suggestions"></div>
-		<div id="station-usage">
-			<h3><span id="station-usage-level"></span> Station Usage</h3>
-			<div>
-				<button id="daily-button" class="selected">Daily Activity</button>
-				<button id="weekly-button">Weekly Activity</button>
-			</div>
-			<div id="daily-usage"></div>
-			<div id="weekly-usage"></div>
-		</div>
-		<div id="covid-risk">
-			<h3><span id="covid-risk-level"></span> Local COVID-19 Risk</h3>
-			<div id="covid-columns">
-				<div id="positivity-rates">
-					<h4>Positivity Rates</h4>
+			<div class="legend">
+				<h4>Station Traffic</h4>
+				<div id="station-legend" class="legend-colors"></div>
+				<div class="legend-axis">
+					<p>0/hr</p>
+					<p>250/hr</p>
+					<p>500+/hr</p>
 				</div>
-				<div id="crowd-rates">
-					<div id="crowd-size-selector">
-						<p>In a crowd of </p>
-						<button>10</button>
-						<button>25</button>
-						<button>50</button>
+			</div>
+			<div class="legend">
+				<h4>COVID-19 Rates</h4>
+				<div id="covid-legend" class="legend-colors"></div>
+				<div class="legend-axis">
+					<p>0%</p>
+					<p>1%</p>
+					<p>2%</p>
+					<p>3%</p>
+					<p>4%</p>
+					<p>≥5%</p>
+				</div>
+			</div>
+			<div id="as-of">
+				<h5>
+					<a href="http://web.mta.info/developers/turnstile.html">MTA usage</a>
+					as of
+					<span id="metro-as-of"></span>
+					.
+				</h5>
+				<h5>
+					<a
+						href="https://github.com/nychealth/coronavirus-data/blob/master/trends/percentpositive-by-modzcta.csv"
+					>
+						COVID-19 rates
+					</a>
+					as of
+					<span id="covid-as-of"></span>
+					.
+				</h5>
+				<hr />
+				<h5>
+					COVID-19 risk estimates assume a 5:1 ascertainment bias as per
+					<a href="https://www.nature.com/articles/s41562-020-01000-9/">
+						Nature Human Behavior
+					</a>
+					.
+				</h5>
+			</div>
+		</div>
+
+		<div id="detail-overlay">
+			<h2 id="current-stations">All Stations</h2>
+			<div id="station-suggestions"></div>
+			<div id="station-usage">
+				<h3>
+					<span id="station-usage-level"></span>
+					Station Usage
+				</h3>
+				<div>
+					<button id="daily-button" class="selected">Daily Activity</button>
+					<button id="weekly-button">Weekly Activity</button>
+				</div>
+				<div id="daily-usage"></div>
+				<div id="weekly-usage"></div>
+			</div>
+			<div id="covid-risk">
+				<h3>
+					<span id="covid-risk-level"></span>
+					Local COVID-19 Risk
+				</h3>
+				<div id="covid-columns">
+					<div id="positivity-rates">
+						<h4>Positivity Rates</h4>
 					</div>
-					<p>We estimate a <span id="crowd-risk-estimate"></span> chance<br>of 1+ positive case.</p>
-					<h5><a href="https://covid19risk.biosci.gatech.edu/">Learn More</a></h5>
+					<div id="crowd-rates">
+						<div id="crowd-size-selector">
+							<p>In a crowd of</p>
+							<button>10</button>
+							<button>25</button>
+							<button>50</button>
+						</div>
+						<p>
+							We estimate a
+							<span id="crowd-risk-estimate"></span>
+							chance
+							<br />
+							of 1+ positive case.
+						</p>
+						<h5>
+							<a href="https://covid19risk.biosci.gatech.edu/">Learn More</a>
+						</h5>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div id="annual-usage">
-			<h3>Subway Usage to Date</h3>
-			<div id="zoom-controls">
-				<button id="zoom-out-button" class="active">Reset Zoom</button>
+			<div id="annual-usage">
+				<h3>Subway Usage to Date</h3>
+				<div id="zoom-controls">
+					<button id="zoom-out-button" class="active">Reset Zoom</button>
+				</div>
+				<div id="year-to-date-usage"></div>
+				<div id="area-tooltip"></div>
 			</div>
-			<div id="year-to-date-usage"></div>
-			<div id="area-tooltip"></div>
 		</div>
-	</div>
 
-	<!-- Load JS libraries -->
-	<script src="js/lib/jquery.min.js"></script>
-	<script src="js/lib/d3.v6.min.js"></script>
-	<script src="js/lib/leaflet.js"></script>
-	<script src="js/lib/d3-tip/index.js"></script>
+		<!-- Load JS libraries -->
+		<script src="js/lib/jquery.min.js"></script>
+		<script src="js/lib/d3.v6.min.js"></script>
+		<script src="js/lib/leaflet.js"></script>
+		<script src="js/lib/d3-tip/index.js"></script>
 
-	<!-- React libraries -->
-	<script src="js/lib/react.development.js"></script>
-	<script src="js/lib/react-dom.development.js"></script>
-	<script src="js/lib/babel.min.js"></script>
+		<!-- React libraries -->
+		<script src="js/lib/react.development.js"></script>
+		<script src="js/lib/react-dom.development.js"></script>
+		<script src="js/lib/babel.min.js"></script>
 
-	<!-- Utility libraries -->
-	<script src="js/dateTimeUtils.js"></script>
-	<script src="js/lib/turf.min.js"></script>
-	<script src="js/lib/moment.min.js"></script>
-	<script src="js/lib/moment-timezone.min.js"></script>
+		<!-- Utility libraries -->
+		<script src="js/dateTimeUtils.js"></script>
+		<script src="js/lib/turf.min.js"></script>
+		<script src="js/lib/moment.min.js"></script>
+		<script src="js/lib/moment-timezone.min.js"></script>
 
-	<!-- Data processing -->
-	<script src="js/dataProcessing.js"></script>
-	<script src="js/dateTimeUtils.js"></script>
-	<!-- Visualization objects -->
-	<script src="js/stationMap.js"></script>
-	<script src="js/timeSelector.js"></script>
-	<script src="js/covidRisk.js"></script>
-	<script src="js/dailyUsageChart.js"></script>
-	<script src="js/weeklyUsageChart.js"></script>
-	<script src="js/yearToDateUsageChart.js"></script>
-	<script src="js/stationSuggestions.js"></script>
+		<!-- Data processing -->
+		<script src="js/dataProcessing.js"></script>
+		<script src="js/dateTimeUtils.js"></script>
+		<!-- Visualization objects -->
+		<script src="js/stationMap.js"></script>
+		<script src="js/timeSelector.js"></script>
+		<script src="js/covidRisk.js"></script>
+		<script src="js/dailyUsageChart.js"></script>
+		<script src="js/weeklyUsageChart.js"></script>
+		<script src="js/yearToDateUsageChart.js"></script>
+		<script src="js/stationSuggestions.js"></script>
 
-	<!-- Load data, create visualizations -->
-	<script src="js/main.js"></script>
-	<script src="js/SearchBar.js" type="text/babel"></script>
-</body>
+		<!-- Load data, create visualizations -->
+		<script src="js/main.js"></script>
+		<script src="js/SearchBar.js" type="text/babel"></script>
+	</body>
 </html>
